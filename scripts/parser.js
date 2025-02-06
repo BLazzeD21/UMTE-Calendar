@@ -1,18 +1,17 @@
 import { chromium } from "playwright";
-import 'dotenv/config';
 
-(async () => {
+export const parseSchedule = async (username, password, headless = true) => {
   try {
-    const browser = await chromium.launch({ headless: false });
+    const browser = await chromium.launch({ headless: headless });
 
     const page = await browser.newPage();
 
     await page.goto("https://umeos.ru/login/index.php");
 
     await page.waitForTimeout(500);
-    await page.locator('input[name="username"]').fill(process.env.UMTE_USERNAME);
+    await page.locator('input[name="username"]').fill(username);
     await page.waitForTimeout(1000);
-    await page.locator('input[name="password"]').fill(process.env.UMTE_PASSWORD);
+    await page.locator('input[name="password"]').fill(password);
     await page.waitForTimeout(1000);
 
     await page.click("#loginbtn", { delay: 1500 });
@@ -83,8 +82,12 @@ import 'dotenv/config';
         .filter((schedule) => schedule !== null);
     });
 
-    console.log(schedule);
+  await browser.close();
+
+  return schedule;
+
   } catch (error) {
     console.error("An error occurred:", error);
+    return [];
   }
-})();
+} 

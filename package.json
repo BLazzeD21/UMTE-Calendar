@@ -1,11 +1,11 @@
 {
   "name": "umte-calendar",
-  "version": "1.0.0",
-  "description": "UMTE-Calendar",
+  "version": "1.0.1",
+  "description": "UTME Portal Integration with Apple Calendar",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node scripts/parser.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
