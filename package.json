@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/BLazzeD21/UMTE-Calendar#readme",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "playwright": "^1.50.1"
   }
 }
