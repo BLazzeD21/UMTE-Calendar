@@ -10,7 +10,7 @@ export const generateCalendar = async (schedule) => {
     console.log(`${colors.cyan}Processing event:${colors.reset}`, event);
 
     const day = String(event.date.day).padStart(2, "0");
-    const month = String(event.date.month - 1).padStart(2, "0"); // Month is zero-based in JS Date
+    const month = String(event.date.month - 1).padStart(2, "0");
     const year = event.date.year;
 
     console.log(`${colors.yellow}Parsing event date: ${day}.${month}.${year}${colors.reset}`);
@@ -32,8 +32,8 @@ export const generateCalendar = async (schedule) => {
 
     console.log(`${colors.green}Event start time: ${startDate}${colors.reset}`);
     console.log(`${colors.green}Event end time: ${endDate}${colors.reset}`);
-
-    const description = `Lecturer: ${event.subject.lecturer}\nClass type: ${event.subject.type[0]}\nLocation: ${event.place}`;
+    
+    const description = `Lecturer: ${event.subject.lecturer}\nClass type: ${event.subject.type}\nLocation: ${event.place}`;
     const summary = `${event.class}. ${event.subject.subject}`;
     const url = event.subject.webinarLink || null;
 
