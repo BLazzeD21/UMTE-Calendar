@@ -55,14 +55,14 @@ export const generateCalendar = async (schedule) => {
 
     if (url !== null) {
       console.log(`${colors.cyan}Webinar link detected. Setting reminder 30 minutes before.${colors.reset}`);
-      icalEvent.createAlarm({ trigger: -30 * 60 });
+      icalEvent.createAlarm({ trigger: "PT30M" });
     } else {
       console.log(`${colors.yellow}No webinar link. Setting reminder 2 hours before.${colors.reset}`);
-      icalEvent.createAlarm({ trigger: -120 * 60 });
+      icalEvent.createAlarm({ trigger: "PT2H" });
     }
 
     console.log(`${colors.blue}Adding additional reminder 5 minutes before the event.${colors.reset}`);
-    icalEvent.createAlarm({ trigger: -5 * 60 });
+    icalEvent.createAlarm({ trigger: "PT5M" });
   });
 
   console.log(`${colors.green}Calendar generation completed!${colors.reset}`);
