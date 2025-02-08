@@ -49,7 +49,7 @@ export const parseSchedule = async (username, password, headless = true) => {
           }
 
           if (cells.length === 4 && index > 0) {
-            console.log("\x1b[36mProcessing a schedule row...\x1b[0m"); // Cyan color for row processing
+            console.log("\x1b[36mProcessing a schedule row...\x1b[0m");
             const classNumber = cells[0].innerText.trim();
             const time = cells[1].innerText.trim().split("-");
             const startTime = time[0];
