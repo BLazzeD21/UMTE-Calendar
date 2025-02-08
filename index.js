@@ -1,5 +1,7 @@
 import "dotenv/config";
 import fs from "fs";
+import { scheduleJob } from "node-schedule";
+
 
 import { parseSchedule } from "./scripts/parser.js";
 import { generateCalendar } from "./scripts/generatorCalendar.js";
@@ -51,3 +53,5 @@ const main = async () => {
 
 console.log(`${colors.yellow}Starting the script...${colors.reset}`);
 main();
+
+scheduleJob("0 */3 * * *", main);
