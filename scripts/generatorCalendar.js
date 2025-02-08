@@ -4,7 +4,13 @@ import { colors } from "../utils/colors.js";
 
 export const generateCalendar = async (schedule) => {
   console.log(`${colors.blue}Creating a new iCalendar instance...${colors.reset}`);
-  const calendar = ical({ name: "UMTE", description: "Class Schedule" });
+  const calendar = ical(
+    { name: "UMTE",
+      description: "Class Schedule",
+      method: "PUBLISH",
+      timezone: "Europe/Moscow",
+    }
+  );
 
   schedule.forEach(async (event) => {
     console.log(`${colors.cyan}Processing event:${colors.reset}`, event);
