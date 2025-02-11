@@ -1,61 +1,59 @@
-import ical from "ical-generator";
+import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
 import { colors } from "../utils/colors.js";
 
-export const generateCalendar = async (schedule) => {
+import { ScheduleItem, GenerateCalendarProps } from "src/types/index.js";
+
+export const generateCalendar = async ({ schedule }: GenerateCalendarProps) => {
   console.log(
     `${colors.blue}Creating a new iCalendar instance...${colors.reset}`
   );
-  const calendar = ical({
+
+  const calendar: ICalCalendar = ical({
     name: "UMTE",
     description: "Class Schedule",
-    method: "PUBLISH",
+    method: ICalCalendarMethod.PUBLISH,
     timezone: "Europe/Moscow",
   });
 
-  schedule.forEach(async (event) => {
-    console.log(`${colors.cyan}Processing event:${colors.reset}`, event);
+  schedule.forEach(async (scheduleItem: ScheduleItem) => {
+    console.log(`${colors.cyan}Processing event:${colors.reset}`, scheduleItem);
 
-    const day = String(event.date.day).padStart(2, "0");
-    const month = String(event.date.month - 1).padStart(2, "0");
-    const year = event.date.year;
+    const { classNumber, date, startTime, endTime, place, subject } =
+      scheduleItem;
+
+    const day = +date.day;
+    const month = +date.month - 1;
+    const year = +date.year;
+
+    const [startTimeMins, startTimeHours] = startTime.split(":").map(Number);
+    const [endTimeMins, endTimeHours] = endTime.split(":").map(Number);
 
     console.log(
       `${colors.yellow}Parsing event date: ${day}.${month}.${year}${colors.reset}`
     );
 
-    const startDate = new Date(
-      year,
-      month,
-      day,
-      event.startTime.split(":")[0],
-      event.startTime.split(":")[1]
-    );
-    const endDate = new Date(
-      year,
-      month,
-      day,
-      event.endTime.split(":")[0],
-      event.endTime.split(":")[1]
-    );
+    const startDate = new Date(year, month, day, startTimeMins, startTimeHours);
+    const endDate = new Date(year, month, day, endTimeMins, endTimeHours);
 
     console.log(`${colors.green}Event start time: ${startDate}${colors.reset}`);
     console.log(`${colors.green}Event end time: ${endDate}${colors.reset}`);
 
-    const description = `Lecturer: ${event.subject.lecturer}\nClass type: ${event.subject.type}\nLocation: ${event.place}`;
-    const summary = `${event.class}. ${event.subject.subject}`;
-    const url = event.subject.webinarLink || null;
+    const description = `Lecturer: ${subject.lecturer}\nClass type: ${subject.type}\nLocation: ${place}`;
 
-    const uid = `${event.class}-${event.subject.subject}-${event.date.year}${event.date.month}${event.date.day}@umte`;
+    const summary = `${classNumber}. ${subject.name}`;
+    const url = subject.webinarLink || null;
+
+    const uid = `${classNumber}-${subject.name}-${scheduleItem.date.year}${date.month}${date.day}@umte`;
 
     console.log(`${colors.blue}Creating iCalendar event...${colors.reset}`);
     const icalEvent = calendar.createEvent({
-      uid: uid,
+      id: uid,
       start: startDate,
       end: endDate,
       summary: summary,
       description: description,
-      location: event.place,
+      location: place,
       url: url,
     });
 

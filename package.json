@@ -1,12 +1,13 @@
 {
   "name": "umte-calendar",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "UTME Portal Integration with Apple Calendar",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node index.js",
-    "start": "pm2 start index.js --name UMTE-schedule --time",
+    "build": "npx tsc",
+    "dev": "node build/index.js",
+    "start": "npx tsc && pm2 start build/index.js --name UMTE-schedule --time",
     "stop": "pm2 stop UMTE-schedule",
     "reload": "pm2 reload UMTE-schedule",
     "delete": "pm2 delete UMTE-schedule"
@@ -27,5 +28,9 @@
     "node-schedule": "^2.1.1",
     "playwright": "^1.50.1",
     "pm2": "^5.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "typescript": "^5.7.3"
   }
 }
