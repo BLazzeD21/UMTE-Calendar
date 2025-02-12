@@ -1,6 +1,6 @@
 ### UTME Portal Integration with Apple Calendar
 
-start: 
+start:
 
 ```bash
 npx playwright install
