@@ -1,4 +1,4 @@
-import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
+import ical, { ICalCalendar, ICalCalendarMethod, ICalAlarmType } from "ical-generator";
 
 import { colors } from "../utils/colors.js";
 
@@ -44,7 +44,7 @@ export const generateCalendar = async ({ schedule }: GenerateCalendarProps) => {
     const summary = `${classNumber}. ${subject.name}`;
     const url = subject.webinarLink || null;
 
-    const uid = `${classNumber}-${subject.name}-${scheduleItem.date.year}${date.month}${date.day}@umte`;
+    const uid = `${classNumber}-${subject.name}-${date.year}${date.month}${date.day}@umte`;
 
     console.log(`${colors.blue}Creating iCalendar event...${colors.reset}`);
     const icalEvent = calendar.createEvent({
@@ -61,18 +61,28 @@ export const generateCalendar = async ({ schedule }: GenerateCalendarProps) => {
       console.log(
         `${colors.cyan}Webinar link detected. Setting reminder 30 minutes before.${colors.reset}`
       );
-      icalEvent.createAlarm({ trigger: -30 * 60 });
+      icalEvent.createAlarm({ 
+        type: ICalAlarmType.display,
+        trigger: 30 * 60
+       });
     } else {
       console.log(
         `${colors.yellow}No webinar link. Setting reminder 2 hours before.${colors.reset}`
       );
-      icalEvent.createAlarm({ trigger: -120 * 60 });
+      icalEvent.createAlarm({ 
+        type: ICalAlarmType.display,
+        trigger: 120 * 60
+       });
     }
 
     console.log(
       `${colors.blue}Adding additional reminder 5 minutes before the event.${colors.reset}`
     );
-    icalEvent.createAlarm({ trigger: -5 * 60 });
+    
+    icalEvent.createAlarm({ 
+      type: ICalAlarmType.display,
+      trigger: 5 * 60
+     });
   });
 
   console.log(`${colors.green}Calendar generation completed!${colors.reset}`);
