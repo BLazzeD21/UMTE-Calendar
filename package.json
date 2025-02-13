@@ -34,6 +34,7 @@
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/node": "^22.13.1",
+		"@types/node-schedule": "^2.1.7",
 		"prettier": "^3.5.0",
 		"typescript": "^5.7.3"
 	}
