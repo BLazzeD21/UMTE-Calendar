@@ -1,8 +1,8 @@
-import { fileURLToPath } from "url";
-import path from "path";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-import { log, colors } from "@/utils";
+import { colors, log } from "@/utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

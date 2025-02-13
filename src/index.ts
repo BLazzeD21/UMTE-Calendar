@@ -1,11 +1,11 @@
 import "dotenv/config";
 import fs from "fs";
-import { scheduleJob } from "node-schedule";
 import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
+import { scheduleJob } from "node-schedule";
 
-import { generateCalendar, parseSchedule, getCurrentCalendarEvents } from "@/scripts";
+import { generateCalendar, getCurrentCalendarEvents, parseSchedule } from "@/scripts";
 
-import { colors, log, getFile, getOldEvents, getNewEvents, prepareEventData, setAlarms } from "@/utils";
+import { colors, getFile, getNewEvents, getOldEvents, log, prepareEventData, setAlarms } from "@/utils";
 
 const dirname = "./calendar";
 

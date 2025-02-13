@@ -1,9 +1,9 @@
-import { EventData , ScheduleEntry } from "@/types";
+import { EventData, ScheduleEntry } from "@/types";
 
-export const prepareEventData = ({ scheduleItem }: { scheduleItem: ScheduleEntry }): EventData  => {
+export const prepareEventData = ({ scheduleItem }: { scheduleItem: ScheduleEntry }): EventData => {
 	const { classNumber, date, startTime, endTime, place, subject } = scheduleItem;
 
-	const {day, year} = date;
+	const { day, year } = date;
 	const month = date.month - 1;
 
 	const [startTimeHours, startTimeMins] = startTime.split(":").map(Number);

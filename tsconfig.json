@@ -2,19 +2,19 @@
 	"include": ["src/**/*"],
 	"compilerOptions": {
 		"paths": {
-      "@/*": ["./*"],
-    },
+			"@/*": ["./*"]
+		},
 		"baseUrl": "./src",
 		"rootDir": "./src",
 		"outDir": "./build",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"target": "ES6",
 		"strict": false,
 		"allowJs": false,
 		"checkJs": false,
 		"alwaysStrict": false,
-		"removeComments": true,
+		"removeComments": true
 	}
 }

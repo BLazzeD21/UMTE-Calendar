@@ -1,10 +1,14 @@
-import { chromium, Browser, Page } from "playwright";
-
-import { DateDetails, ScheduleParserOptions , ClassSchedule , SubjectDetails } from "@/types";
+import { Browser, chromium, Page } from "playwright";
 
 import { colors, log } from "@/utils";
 
-export const parseSchedule = async ({ username, password, headless = true }: ScheduleParserOptions ): Promise<ClassSchedule > => {
+import { ClassSchedule, DateDetails, ScheduleParserOptions, SubjectDetails } from "@/types";
+
+export const parseSchedule = async ({
+	username,
+	password,
+	headless = true,
+}: ScheduleParserOptions): Promise<ClassSchedule> => {
 	let browser: Browser;
 
 	try {

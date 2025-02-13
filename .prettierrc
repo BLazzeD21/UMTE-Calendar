@@ -8,5 +8,10 @@
 	"bracketSpacing": true,
 	"jsxBracketSameLine": true,
 	"arrowParens": "always",
-	"requirePragma": false
+	"requirePragma": false,
+	"plugins": ["@trivago/prettier-plugin-sort-imports"],
+	"importOrder": ["<THIRD_PARTY_MODULES>", "^@/scripts", "^@/utils", "^@/types", "^[./]"],
+	"importOrderSeparation": true,
+	"importOrderSortSpecifiers": true,
+	"importOrderCaseInsensitive": true
 }
