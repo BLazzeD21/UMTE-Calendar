@@ -1,7 +1,7 @@
 export type DateType = {
-	day: string;
-	month: string;
-	year: string;
+	day: number;
+	month: number;
+	year: number;
 };
 
 export type SubjectType = {

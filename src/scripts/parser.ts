@@ -61,7 +61,7 @@ export const parseSchedule = async ({ username, password, headless = true }: Par
 						const dateSplit = currentDate.split(" ");
 						const dayOfWeek = dateSplit[0].trim();
 
-						const [day, month, year] = dateSplit[1].trim().split(".");
+						const [day, month, year] = dateSplit[1].trim().split(".").map(Number);
 						const date: DateType = { day, month, year };
 
 						const place = cells[2].innerText.trim();
