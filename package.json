@@ -26,6 +26,7 @@
 	"dependencies": {
 		"dotenv": "^16.4.7",
 		"ical-generator": "^8.1.1",
+		"node-ical": "^0.20.1",
 		"node-schedule": "^2.1.1",
 		"playwright": "^1.50.1",
 		"pm2": "^5.4.3"

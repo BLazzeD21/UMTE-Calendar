@@ -42,3 +42,21 @@ export interface PrepareEventDataResponse {
 	uid: string;
 	place: string;
 }
+
+export type URL = {
+	params: {
+		VALUE: "URI";
+	};
+	val: string;
+};
+
+export interface ICalEvent {
+	uid: string;
+	type: "VEVENT";
+	summary: string;
+	start: Date;
+	end: Date;
+	location: string;
+	description: string;
+	url?: URL | string;
+}
