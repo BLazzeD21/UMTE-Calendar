@@ -1,45 +1,48 @@
 import { chromium, Browser, Page } from "playwright";
 
-import { colors } from "../utils/colors.js";
+import { DateType, ParseScheduleProps, Schedule, SubjectType } from "../types/index.js";
 
-import { DateType, ParseScheduleProps, Schedule, SubjectType } from "src/types/index.js";
+import { colors } from "../utils/colors.js";
+import { log } from "../utils/log.js";
 
 export const parseSchedule = async ({ username, password, headless = true }: ParseScheduleProps): Promise<Schedule> => {
 	let browser: Browser;
 
 	try {
-		console.log(`${colors.blue}Launching browser...${colors.reset}`);
+		log("Launching browser...", colors.blue);
 		browser = await chromium.launch({ headless: headless });
 		const page: Page = await browser.newPage();
 
-		console.log(`${colors.cyan}Navigating to the login page...${colors.reset}`);
+		log("Navigating to the login page...", colors.cyan);
 		await page.goto("https://umeos.ru/login/index.php");
 		await page.waitForTimeout(500);
 
-		console.log(`${colors.yellow}Filling in the username...${colors.reset}`);
+		log("Filling in the username...", colors.yellow);
+		await page.waitForSelector('input[name="username"]');
 		await page.locator('input[name="username"]').fill(username);
 		await page.waitForTimeout(1000);
 
-		console.log(`${colors.yellow}Filling in the password...${colors.reset}`);
+		log("Filling in the password...", colors.yellow);
+		await page.waitForSelector('input[name="password"]');
 		await page.locator('input[name="password"]').fill(password);
 		await page.waitForTimeout(1000);
 
-		console.log(`${colors.blue}Clicking the login button...${colors.reset}`);
+		log("Clicking the login button...", colors.blue);
 		await page.click("#loginbtn", { delay: 1500 });
 
-		console.log(`${colors.cyan}Waiting for successful login...${colors.reset}`);
+		log("Waiting for successful login...", colors.cyan);
 		await page.waitForURL("https://umeos.ru/my/", { waitUntil: "load" });
 
 		await page.waitForTimeout(1000);
 
-		console.log(`${colors.cyan}Navigating to the schedule page...${colors.reset}`);
+		log("Navigating to the schedule page...", colors.cyan);
 		await page.goto("https://umeos.ru/blocks/umerasp/schedule.php?t=student");
 
-		console.log(`${colors.yellow}Waiting for schedule table to load...${colors.reset}`);
+		log("Waiting for schedule table to load...", colors.yellow);
 		await page.waitForSelector("#sched_tabs");
 		await page.waitForTimeout(1000);
 
-		console.log(`${colors.blue}Extracting schedule data...${colors.reset}`);
+		log("Extracting schedule data...", colors.blue);
 		const schedule = await page.$$eval("tbody tr", (rows: HTMLElement[]) => {
 			let currentDate: string;
 
@@ -98,13 +101,13 @@ export const parseSchedule = async ({ username, password, headless = true }: Par
 				.filter((schedule) => schedule !== null);
 		});
 
-		console.log(`${colors.green}Schedule successfully extracted!${colors.reset}`);
+		log("Schedule successfully extracted!", colors.green);
 		return schedule;
 	} catch (error) {
-		console.error(`${colors.red}An error occurred: ${error}${colors.reset}`);
+		log(`An error occurred: ${error}`, colors.red);
 		return [];
 	} finally {
-		console.log(`${colors.blue}Closing browser...${colors.reset}`);
+		log("Closing browser...", colors.blue);
 		if (browser) {
 			await browser.close();
 		}

@@ -1,22 +1,16 @@
 import { PrepareEventDataResponse, ScheduleItem } from "../types/index.js";
 
-import { colors } from "./colors.js";
-
 export const prepareEventData = ({ scheduleItem }: { scheduleItem: ScheduleItem }): PrepareEventDataResponse => {
 	const { classNumber, date, startTime, endTime, place, subject } = scheduleItem;
 
-	const day = +date.day;
+	const {day, year} = date;
+	const month = date.month - 1;
 
-	const month = +date.month - 1;
-	const year = +date.year;
+	const [startTimeHours, startTimeMins] = startTime.split(":").map(Number);
+	const [endTimeHours, endTimeMins] = endTime.split(":").map(Number);
 
-	console.log(`${colors.yellow}Preparing event date: ${day}.${month}.${year}${colors.reset}`);
-
-	const [startTimeMins, startTimeHours] = startTime.split(":").map(Number);
-	const [endTimeMins, endTimeHours] = endTime.split(":").map(Number);
-
-	const startDate = new Date(year, month, day, startTimeMins, startTimeHours);
-	const endDate = new Date(year, month, day, endTimeMins, endTimeHours);
+	const startDate = new Date(year, month, day, startTimeHours, startTimeMins);
+	const endDate = new Date(year, month, day, endTimeHours, endTimeMins);
 
 	const description = `Lecturer: ${subject.lecturer}\nClass type: ${subject.type}\nLocation: ${place}`;
 

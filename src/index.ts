@@ -1,52 +1,104 @@
 import "dotenv/config";
 import fs from "fs";
 import { scheduleJob } from "node-schedule";
+import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
-import { parseSchedule } from "./scripts/parser.js";
-import { generateCalendar } from "./scripts/generatorCalendar.js";
+import { generateCalendar, parseSchedule, getCurrentCalendarEvents } from "@/scripts";
 
-import { colors } from "./utils/colors.js";
+import { colors, log, getFile, getOldEvents, getNewEvents, prepareEventData, setAlarms } from "@/utils";
 
 const dirname = "./calendar";
 
 const main = async () => {
-	console.log(`${colors.blue}Starting schedule parsing...${colors.reset}`);
+	log("Starting the script...", colors.yellow);
 
-	const schedule = await parseSchedule({
-		username: process.env.UMTE_USERNAME,
-		password: process.env.UMTE_PASSWORD,
-	});
+	try {
+		if (!process.env.UMTE_USERNAME || !process.env.UMTE_PASSWORD) {
+			log("Missing UMTE_USERNAME or UMTE_PASSWORD in environment variables. Exiting...", colors.red);
+			return;
+		}
 
-	if (schedule.length) {
-		console.log(`${colors.green}Schedule successfully retrieved!${colors.reset}`);
-	} else {
-		console.error(`${colors.red}Error while getting schedule. Exiting...${colors.reset}`);
-		return;
-	}
+		log("Starting schedule parsing...", colors.blue);
 
-	console.log(`${colors.cyan}Checking if the calendar directory exists...${colors.reset}`);
-	if (!fs.existsSync(dirname)) {
-		console.log(`${colors.yellow}Directory does not exist. Creating it...${colors.reset}`);
-		fs.mkdirSync(dirname);
-	}
+		const schedule = await parseSchedule({
+			username: process.env.UMTE_USERNAME,
+			password: process.env.UMTE_PASSWORD,
+		});
 
-	console.log(`${colors.cyan}Saving schedule data to schedule.json...${colors.reset}`);
-	fs.writeFileSync("calendar/schedule.json", JSON.stringify(schedule, null, 4), "utf-8");
-	console.log(`${colors.green}Data successfully written to schedule.json${colors.reset}`);
+		if (schedule.length) {
+			log("Schedule successfully retrieved!", colors.green);
+		} else {
+			log("No schedule data found. Exiting...", colors.red);
+			return;
+		}
 
-	console.log(`${colors.blue}Generating iCalendar file...${colors.reset}`);
-	const calendar = await generateCalendar({ schedule });
+		log("Checking if the calendar directory exists...", colors.cyan);
+		await fs.promises.mkdir(dirname, { recursive: true });
 
-	if (calendar) {
-		console.log(`${colors.green}Calendar successfully created!${colors.reset}`);
-		fs.writeFileSync("calendar/calendar.ics", calendar.toString(), "utf-8");
-		console.log(`${colors.green}Data successfully written to calendar.ics${colors.reset}`);
-	} else {
-		console.error(`${colors.red}Error generating calendar.${colors.reset}`);
+		const calendarFile = getFile("../../calendar/calendar.ics");
+
+		if (calendarFile) {
+			const calendarEvents = getCurrentCalendarEvents(calendarFile);
+			const oldCalendarEvents = getOldEvents(calendarEvents);
+			const parsedEvents = getNewEvents(schedule);
+
+			const calendar: ICalCalendar = ical({
+				name: "UMTE",
+				description: "Class Schedule",
+				method: ICalCalendarMethod.PUBLISH,
+				timezone: "Europe/Moscow",
+			});
+
+			oldCalendarEvents.forEach((calEvent) => {
+				const url =
+					typeof calEvent.url === "object" && "val" in calEvent.url ? calEvent.url.val.toString() : calEvent.url || "";
+
+				const icalEvent = calendar.createEvent({
+					id: calEvent.uid,
+					start: calEvent.start,
+					end: calEvent.end,
+					summary: calEvent.summary,
+					description: calEvent.description,
+					location: calEvent.location,
+					url: url,
+				});
+				setAlarms(url, icalEvent);
+			});
+
+			parsedEvents.forEach((calEvent) => {
+				const { startDate, endDate, description, summary, url, uid, place } = prepareEventData({
+					scheduleItem: calEvent,
+				});
+
+				const icalEvent = calendar.createEvent({
+					id: uid,
+					start: startDate,
+					end: endDate,
+					summary: summary,
+					description: description,
+					location: place,
+					url: url,
+				});
+				setAlarms(url, icalEvent);
+			});
+
+			await fs.promises.writeFile("calendar/calendar.ics", calendar.toString(), "utf-8");
+			log("Calendar successfully created and written to calendar.ics!", colors.green);
+		} else {
+			const calendar = await generateCalendar({ schedule });
+
+			if (calendar) {
+				await fs.promises.writeFile("calendar/calendar.ics", calendar.toString(), "utf-8");
+				log("Calendar successfully created and written to calendar.ics!", colors.green);
+			} else {
+				log("Error generating calendar.", colors.red);
+			}
+		}
+	} catch (error) {
+		log(`An error occurred: ${error.message}`, colors.red);
 	}
 };
 
-console.log(`${colors.yellow}Starting the script...${colors.reset}`);
 main();
 
 scheduleJob("0 */3 * * *", main);
