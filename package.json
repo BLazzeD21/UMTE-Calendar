@@ -7,7 +7,7 @@
 	"scripts": {
 		"prettier": "npx prettier . --write",
 		"build": "npx tsc",
-		"dev": "node build/index.js",
+		"dev": "npx tsc && node build/index.js",
 		"start": "npx tsc && pm2 start build/index.js --name UMTE-schedule --time -i max",
 		"stop": "pm2 stop UMTE-schedule",
 		"reload": "pm2 reload UMTE-schedule",
