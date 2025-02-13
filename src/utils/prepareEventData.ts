@@ -1,4 +1,4 @@
-import { PrepareEventDataResponse, ScheduleItem } from "../types/index.js";
+import { PrepareEventDataResponse, ScheduleItem } from "@/types";
 
 export const prepareEventData = ({ scheduleItem }: { scheduleItem: ScheduleItem }): PrepareEventDataResponse => {
 	const { classNumber, date, startTime, endTime, place, subject } = scheduleItem;

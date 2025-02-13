@@ -1,9 +1,8 @@
 import { chromium, Browser, Page } from "playwright";
 
-import { DateType, ParseScheduleProps, Schedule, SubjectType } from "../types/index.js";
+import { DateType, ParseScheduleProps, Schedule, SubjectType } from "@/types";
 
-import { colors } from "../utils/colors.js";
-import { log } from "../utils/log.js";
+import { colors, log } from "@/utils";
 
 export const parseSchedule = async ({ username, password, headless = true }: ParseScheduleProps): Promise<Schedule> => {
 	let browser: Browser;

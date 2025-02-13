@@ -1,4 +1,4 @@
-import { ICalEvent } from "../../types/index.js";
+import { ICalEvent } from "@/types";
 
 const todayTimestamp = new Date();
 todayTimestamp.setHours(0, 0, 0, 0);

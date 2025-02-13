@@ -1,12 +1,8 @@
 import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
-import { colors } from "../utils/colors.js";
-import { prepareEventData } from "../utils/prepareEventData.js";
+import { ScheduleItem, GenerateCalendarProps } from "@/types";
 
-import { ScheduleItem, GenerateCalendarProps } from "../types/index.js";
-import { log } from "../utils/log.js";
-
-import { setAlarms } from "../utils/events/setAlarms.js";
+import { colors, prepareEventData, log, setAlarms } from "@/utils";
 
 export const generateCalendar = async ({ schedule }: GenerateCalendarProps) => {
 	log("Creating a new iCalendar instance", colors.blue);

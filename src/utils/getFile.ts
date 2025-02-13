@@ -2,8 +2,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
 
-import { log } from "./log.js";
-import { colors } from "./colors.js";
+import { log, colors } from "@/utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

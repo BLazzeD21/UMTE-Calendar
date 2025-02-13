@@ -1,4 +1,4 @@
-import { colors } from "./colors.js";
+import { colors } from "@/utils";
 
 
 export const log = (message: string, color = colors.reset): void => {

@@ -1,6 +1,6 @@
 import ical from "node-ical";
 
-import { ICalEvent, URL } from "../types/index.js";
+import { ICalEvent, URL } from "@/types";
 
 export const getCurrentCalendarEvents = (calendarData: string) => {
 	let events: ICalEvent[] = [];
