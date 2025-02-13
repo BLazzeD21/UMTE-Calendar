@@ -1,10 +1,10 @@
 import { chromium, Browser, Page } from "playwright";
 
-import { DateType, ParseScheduleProps, Schedule, SubjectType } from "@/types";
+import { DateDetails, ScheduleParserOptions , ClassSchedule , SubjectDetails } from "@/types";
 
 import { colors, log } from "@/utils";
 
-export const parseSchedule = async ({ username, password, headless = true }: ParseScheduleProps): Promise<Schedule> => {
+export const parseSchedule = async ({ username, password, headless = true }: ScheduleParserOptions ): Promise<ClassSchedule > => {
 	let browser: Browser;
 
 	try {
@@ -64,7 +64,7 @@ export const parseSchedule = async ({ username, password, headless = true }: Par
 						const dayOfWeek = dateSplit[0].trim();
 
 						const [day, month, year] = dateSplit[1].trim().split(".").map(Number);
-						const date: DateType = { day, month, year };
+						const date: DateDetails = { day, month, year };
 
 						const place = cells[2].innerText.trim();
 
@@ -78,7 +78,7 @@ export const parseSchedule = async ({ username, password, headless = true }: Par
 
 						const type = types.length === 1 ? types[0] : types.join(", ");
 
-						const subjectDetails: SubjectType = {
+						const subjectDetails: SubjectDetails = {
 							name: subjectName || "",
 							lecturer: subjectLecturer || "",
 							type: type,

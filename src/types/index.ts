@@ -1,39 +1,39 @@
-export type DateType = {
+export type DateDetails = {
 	day: number;
 	month: number;
 	year: number;
 };
 
-export type SubjectType = {
+export type SubjectDetails = {
 	name: string;
 	lecturer: string;
 	type: string;
 	webinarLink: string;
 };
 
-export interface ScheduleItem {
+export interface ScheduleEntry {
 	classNumber: string;
 	dayOfWeek: string;
-	date: DateType;
+	date: DateDetails;
 	startTime: string;
 	endTime: string;
 	place: string;
-	subject: SubjectType;
+	subject: SubjectDetails;
 }
 
-export type Schedule = ScheduleItem[] | [];
+export type ClassSchedule = ScheduleEntry[] | [];
 
-export interface ParseScheduleProps {
+export interface ScheduleParserOptions {
 	username: string;
 	password: string;
 	headless?: boolean;
 }
 
-export interface GenerateCalendarProps {
-	schedule: Schedule;
+export interface CalendarGenerationOptions {
+	schedule: ClassSchedule;
 }
 
-export interface PrepareEventDataResponse {
+export interface EventData {
 	startDate: Date;
 	endDate: Date;
 	description: string;
@@ -43,14 +43,14 @@ export interface PrepareEventDataResponse {
 	place: string;
 }
 
-export type URL = {
+export type URLDetails = {
 	params: {
 		VALUE: "URI";
 	};
 	val: string;
 };
 
-export interface ICalEvent {
+export interface CalendarEvent {
 	uid: string;
 	type: "VEVENT";
 	summary: string;
@@ -58,5 +58,5 @@ export interface ICalEvent {
 	end: Date;
 	location: string;
 	description: string;
-	url?: URL | string;
+	url?: URLDetails | string;
 }

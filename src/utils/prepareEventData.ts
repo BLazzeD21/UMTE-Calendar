@@ -1,6 +1,6 @@
-import { PrepareEventDataResponse, ScheduleItem } from "@/types";
+import { EventData , ScheduleEntry } from "@/types";
 
-export const prepareEventData = ({ scheduleItem }: { scheduleItem: ScheduleItem }): PrepareEventDataResponse => {
+export const prepareEventData = ({ scheduleItem }: { scheduleItem: ScheduleEntry }): EventData  => {
 	const { classNumber, date, startTime, endTime, place, subject } = scheduleItem;
 
 	const {day, year} = date;

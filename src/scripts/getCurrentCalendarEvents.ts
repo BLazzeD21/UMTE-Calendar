@@ -1,9 +1,9 @@
 import ical from "node-ical";
 
-import { ICalEvent, URL } from "@/types";
+import { CalendarEvent , URLDetails  } from "@/types";
 
-export const getCurrentCalendarEvents = (calendarData: string) => {
-	let events: ICalEvent[] = [];
+export const getCurrentCalendarEvents = (calendarData: string): CalendarEvent[] => {
+	let events: CalendarEvent[] = [];
 
 	const parsedData = ical.parseICS(calendarData);
 
@@ -11,7 +11,7 @@ export const getCurrentCalendarEvents = (calendarData: string) => {
 		const event = parsedData[key];
 
 		if (event.type === "VEVENT") {
-			let url: URL | string | undefined = undefined;
+			let url: URLDetails | string | undefined = undefined;
 
 			if (event.url) {
 				if (typeof event.url === "object") {

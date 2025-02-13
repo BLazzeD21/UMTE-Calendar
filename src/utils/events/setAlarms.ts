@@ -1,6 +1,6 @@
 import { ICalAlarmType, ICalEvent } from "ical-generator";
 
-export const setAlarms = (url: string, icalEvent: ICalEvent) => {
+export const setAlarms = (url: string, icalEvent: ICalEvent): void => {
 	if (url !== null) {
 		icalEvent.createAlarm({
 			type: ICalAlarmType.display,

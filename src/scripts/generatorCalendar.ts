@@ -1,10 +1,10 @@
 import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
-import { ScheduleItem, GenerateCalendarProps } from "@/types";
+import { ScheduleEntry, CalendarGenerationOptions  } from "@/types";
 
 import { colors, prepareEventData, log, setAlarms } from "@/utils";
 
-export const generateCalendar = async ({ schedule }: GenerateCalendarProps) => {
+export const generateCalendar = async ({ schedule }: CalendarGenerationOptions ): Promise<ICalCalendar> => {
 	log("Creating a new iCalendar instance", colors.blue);
 
 	const calendar: ICalCalendar = ical({
@@ -14,7 +14,7 @@ export const generateCalendar = async ({ schedule }: GenerateCalendarProps) => {
 		timezone: "Europe/Moscow",
 	});
 
-	schedule.forEach(async (scheduleItem: ScheduleItem) => {
+	schedule.forEach(async (scheduleItem: ScheduleEntry) => {
 		const { startDate, endDate, description, summary, url, uid, place } = prepareEventData({ scheduleItem });
 
 		const icalEvent = calendar.createEvent({
