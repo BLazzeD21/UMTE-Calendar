@@ -8,13 +8,17 @@
 		"rootDir": "./src",
 		"outDir": "./build",
 		"module": "ESNext",
-		"moduleResolution": "bundler",
+		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"target": "ES6",
 		"strict": false,
 		"allowJs": false,
 		"checkJs": false,
 		"alwaysStrict": false,
-		"removeComments": true
+		"removeComments": true,
+		"esModuleInterop": true
+	},
+	"tsc-alias": {
+		"resolveFullPaths": true
 	}
 }

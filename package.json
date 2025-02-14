@@ -6,9 +6,9 @@
 	"type": "module",
 	"scripts": {
 		"prettier": "npx prettier . --write",
-		"build": "npx tsc",
-		"dev": "npx tsc && node build/index.js",
-		"start": "npx tsc && pm2 start build/index.js --name UMTE-schedule --time -i max",
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+		"dev": "npm run build && node build/index.js",
+		"start": "npm run build && pm2 start build/index.js --name UMTE-schedule --time -i max",
 		"stop": "pm2 stop UMTE-schedule",
 		"reload": "pm2 reload UMTE-schedule",
 		"delete": "pm2 delete UMTE-schedule"
@@ -29,7 +29,8 @@
 		"node-ical": "^0.20.1",
 		"node-schedule": "^2.1.1",
 		"playwright": "^1.50.1",
-		"pm2": "^5.4.3"
+		"pm2": "^5.4.3",
+		"tsc-alias": "^1.8.10"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
