@@ -101,4 +101,4 @@ const main = async () => {
 
 main();
 
-const job = scheduleJob('0 */2 * * *', main);
+const job = scheduleJob("0 */2 * * *", main);
