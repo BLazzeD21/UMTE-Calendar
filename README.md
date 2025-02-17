@@ -170,7 +170,9 @@ sudo systemctl restart nginx
 
 To check if nginx is serving the `calendar.ics` file, use the curl command. Replace `yourdomain.com` with your domain or IP address:
 
-```curl -o - -I http://yourdomain.com/calendar.ics```
+```bash
+curl -o - -I http://yourdomain.com/calendar.icsэ
+```
 
 If the file is being served correctly, you will see this response. If the file isn't accessible, double-check that nginx is running, the configuration is correct, and that the file exists at `/var/www/html/calendar.ics`.
 
