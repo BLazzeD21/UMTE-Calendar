@@ -97,4 +97,5 @@ const main = async () => {
 };
 
 main();
-scheduleJob("0 */3 * * *", main);
+
+const job = scheduleJob("0 */2 * * *", main);
