@@ -12,7 +12,7 @@ export const getFile = (filePath: string): string | null => {
 
 	try {
 		if (!fs.existsSync(fullPath)) {
-			log(`Error: File not found at ${filePath}`);
+			log(`Error: File not found at ${filePath}`, colors.red);
 			return null;
 		}
 

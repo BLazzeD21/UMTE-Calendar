@@ -12,40 +12,31 @@ export const parseSchedule = async ({
 	let browser: Browser;
 
 	try {
-		log("Launching browser...", colors.blue);
 		browser = await chromium.launch({ headless: headless });
 		const page: Page = await browser.newPage();
 
-		log("Navigating to the login page...", colors.cyan);
 		await page.goto("https://umeos.ru/login/index.php");
 		await page.waitForTimeout(500);
 
-		log("Filling in the username...", colors.yellow);
 		await page.waitForSelector('input[name="username"]');
 		await page.locator('input[name="username"]').fill(username);
 		await page.waitForTimeout(1000);
 
-		log("Filling in the password...", colors.yellow);
 		await page.waitForSelector('input[name="password"]');
 		await page.locator('input[name="password"]').fill(password);
 		await page.waitForTimeout(1000);
 
-		log("Clicking the login button...", colors.blue);
 		await page.click("#loginbtn", { delay: 1500 });
 
-		log("Waiting for successful login...", colors.cyan);
 		await page.waitForURL("https://umeos.ru/my/", { waitUntil: "load" });
 
 		await page.waitForTimeout(1000);
 
-		log("Navigating to the schedule page...", colors.cyan);
 		await page.goto("https://umeos.ru/blocks/umerasp/schedule.php?t=student");
 
-		log("Waiting for schedule table to load...", colors.yellow);
 		await page.waitForSelector("#sched_tabs");
 		await page.waitForTimeout(1000);
 
-		log("Extracting schedule data...", colors.blue);
 		const schedule = await page.$$eval("tbody tr", (rows: HTMLElement[]) => {
 			let currentDate: string;
 
@@ -59,7 +50,6 @@ export const parseSchedule = async ({
 					}
 
 					if (cells.length === 4 && index > 0) {
-						console.log("\x1b[36mProcessing a schedule row...\x1b[0m");
 						const classNumber = cells[0].innerText.trim();
 						const time = cells[1].innerText.trim().split("-");
 						const [startTime, endTime] = time;
@@ -103,14 +93,11 @@ export const parseSchedule = async ({
 				})
 				.filter((schedule) => schedule !== null);
 		});
-
-		log("Schedule successfully extracted!", colors.green);
 		return schedule;
 	} catch (error) {
 		log(`An error occurred: ${error}`, colors.red);
 		return [];
 	} finally {
-		log("Closing browser...", colors.blue);
 		if (browser) {
 			await browser.close();
 		}

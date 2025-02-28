@@ -1,12 +1,10 @@
 import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
-import { colors, log, prepareEventData, setAlarms } from "@/utils";
+import { prepareEventData, setAlarms } from "@/utils";
 
 import { CalendarGenerationOptions, ScheduleEntry } from "@/types";
 
 export const generateCalendar = async ({ schedule }: CalendarGenerationOptions): Promise<ICalCalendar> => {
-	log("Creating a new iCalendar instance", colors.blue);
-
 	const calendar: ICalCalendar = ical({
 		name: "UMTE",
 		description: "Class Schedule",
