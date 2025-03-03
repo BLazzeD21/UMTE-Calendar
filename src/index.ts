@@ -4,7 +4,7 @@ import { scheduleJob } from "node-schedule";
 
 import { generateCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
-import { colors, getFile, log } from "@/utils";
+import { getFile, log } from "@/utils";
 
 const dirname = "./calendar";
 
@@ -15,7 +15,7 @@ const startScript = async () => {
 	});
 
 	if (!schedule.length) {
-		log("No schedule data found. Exiting...", colors.red);
+		log("No schedule data found. Exiting...", "red");
 		return;
 	}
 
@@ -24,14 +24,14 @@ const startScript = async () => {
 	if (calendarFile) {
 		await updateCalendar(calendarFile, schedule);
 	} else {
-		log("No existing calendar found. Generating new calendar...", colors.yellow);
+		log("No existing calendar found. Generating new calendar...", "yellow");
 		const calendar = await generateCalendar({ schedule });
 		if (calendar) {
 			await promises.writeFile("calendar/calendar.ics", calendar.toString(), "utf-8");
-			log(`New calendar events: ${schedule.length}`, colors.blue);
-			log(`New calendar successfully created!`, colors.green);
+			log(`New calendar events: ${schedule.length}`, "blue");
+			log(`New calendar successfully created!`, "green");
 		} else {
-			log("Error generating calendar.", colors.red);
+			log("Error generating calendar.", "red");
 		}
 	}
 };
@@ -43,14 +43,14 @@ const setScheduleUpdate = async () => {
 	});
 
 	if (!schedule.length) {
-		log("No schedule data found. Exiting...", colors.red);
+		log("No schedule data found. Exiting...", "red");
 		return;
 	}
 
 	const calendarFile = await getFile("../../calendar/calendar.ics");
 
 	if (!calendarFile) {
-		log("Existing calendar not found. Skipping update...", colors.yellow);
+		log("Existing calendar not found. Skipping update...", "yellow");
 		return;
 	}
 
@@ -60,7 +60,7 @@ const setScheduleUpdate = async () => {
 
 const main = async () => {
 	if (!process.env.UMTE_USERNAME || !process.env.UMTE_PASSWORD) {
-		log("Missing environment variables. Exiting...", colors.red);
+		log("Missing environment variables. Exiting...", "red");
 		return;
 	}
 

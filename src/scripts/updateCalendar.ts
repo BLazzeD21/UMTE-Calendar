@@ -3,12 +3,12 @@ import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
 import { getCurrentCalendarEvents } from "@/scripts";
 
-import { colors, getNewEvents, getOldEvents, log, setOldCalendarEvents } from "@/utils";
+import { getNewEvents, getOldEvents, log, setOldCalendarEvents } from "@/utils";
 
 import { ClassSchedule } from "@/types";
 
 export const updateCalendar = async (calendarFile: string, schedule: ClassSchedule): Promise<void> => {
-	log("Existing calendar file found. Updating...", colors.cyan);
+	log("Existing calendar file found. Updating...", "cyan");
 	const calendarEvents = getCurrentCalendarEvents(calendarFile);
 	const oldCalendarEvents = getOldEvents(calendarEvents);
 	const newCalendarEvents = getNewEvents(schedule);
@@ -21,7 +21,7 @@ export const updateCalendar = async (calendarFile: string, schedule: ClassSchedu
 	});
 
 	if (!oldCalendarEvents.length || !newCalendarEvents.length) {
-		log("There are no old events.", colors.red);
+		log("There are no old events.", "red");
 		return;
 	}
 	await setOldCalendarEvents(oldCalendarEvents, newCalendarEvents, calendar);
@@ -33,8 +33,8 @@ export const updateCalendar = async (calendarFile: string, schedule: ClassSchedu
 
 	log(
 		`Old events: ${oldEventsLength} | Parsed events: ${parsedEventsLength} | Total events: ${totalEventsLength}`,
-		colors.blue,
+		"blue",
 	);
 
-	log(`Calendar successfully updated!`, colors.green);
+	log(`Calendar successfully updated!`, "green");
 };

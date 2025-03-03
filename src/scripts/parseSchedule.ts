@@ -1,6 +1,6 @@
 import { Browser, chromium, Page } from "playwright";
 
-import { colors, log } from "@/utils";
+import { log } from "@/utils";
 
 import { ClassSchedule, DateDetails, ScheduleParserOptions, SubjectDetails } from "@/types";
 
@@ -95,7 +95,7 @@ export const parseSchedule = async ({
 		});
 		return schedule;
 	} catch (error) {
-		log(`An error occurred: ${error}`, colors.red);
+		log(`An error occurred: ${error}`, "red");
 		return [];
 	} finally {
 		if (browser) {
