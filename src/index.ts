@@ -8,14 +8,7 @@ import { colors, getFile, log } from "@/utils";
 
 const dirname = "./calendar";
 
-const main = async () => {
-	if (!process.env.UMTE_USERNAME || !process.env.UMTE_PASSWORD) {
-		log("Missing environment variables. Exiting...", colors.red);
-		return;
-	}
-
-	await promises.mkdir(dirname, { recursive: true });
-
+const startScript = async () => {
 	const schedule = await parseSchedule({
 		username: process.env.UMTE_USERNAME,
 		password: process.env.UMTE_PASSWORD,
@@ -43,6 +36,44 @@ const main = async () => {
 	}
 };
 
-main();
+const setScheduleUpdate = async () => {
+	const schedule = await parseSchedule({
+		username: process.env.UMTE_USERNAME,
+		password: process.env.UMTE_PASSWORD,
+	});
 
-const job = scheduleJob("0 */2 * * *", main);
+	if (!schedule.length) {
+		log("No schedule data found. Exiting...", colors.red);
+		return;
+	}
+
+	const calendarFile = await getFile("../../calendar/calendar.ics");
+
+	if (!calendarFile) {
+		log("Existing calendar not found. Skipping update...", colors.yellow);
+		return;
+	}
+
+	await updateCalendar(calendarFile, schedule);
+	await promises.writeFile("calendar/calendar.ics", calendarFile.toString(), "utf-8");
+};
+
+const main = async () => {
+	if (!process.env.UMTE_USERNAME || !process.env.UMTE_PASSWORD) {
+		log("Missing environment variables. Exiting...", colors.red);
+		return;
+	}
+
+	await promises.mkdir(dirname, { recursive: true });
+
+	startScript();
+
+	setTimeout(
+		() => {
+			scheduleJob("0 */2 * * *", setScheduleUpdate);
+		},
+		120 * 60 * 1000,
+	);
+};
+
+main();
