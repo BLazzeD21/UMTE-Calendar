@@ -23,7 +23,7 @@ export const getCurrentCalendarEvents = (calendarData: string): CalendarEvent[] 
 
 			events.push({
 				type: "VEVENT",
-				uid: event.uid || "",
+				id: event.uid || "",
 				summary: event.summary || "",
 				start: event.start || undefined,
 				end: event.end || undefined,

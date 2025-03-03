@@ -7,7 +7,7 @@ import { colors, log } from "@/utils";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getFile = (filePath: string): string | null => {
+export const getFile = async (filePath: string): Promise<string | null> => {
 	const fullPath = path.resolve(__dirname, filePath);
 
 	try {
@@ -16,7 +16,7 @@ export const getFile = (filePath: string): string | null => {
 			return null;
 		}
 
-		const fileData = fs.readFileSync(fullPath, "utf-8");
+		const fileData = fs.promises.readFile(fullPath, "utf-8");
 
 		return fileData;
 	} catch (error) {

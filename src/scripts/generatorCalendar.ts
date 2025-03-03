@@ -13,19 +13,11 @@ export const generateCalendar = async ({ schedule }: CalendarGenerationOptions):
 	});
 
 	schedule.forEach(async (scheduleItem: ScheduleEntry) => {
-		const { startDate, endDate, description, summary, url, uid, place } = prepareEventData({ scheduleItem });
+		const event = prepareEventData({ scheduleItem });
 
-		const icalEvent = calendar.createEvent({
-			id: uid,
-			start: startDate,
-			end: endDate,
-			summary: summary,
-			description: description,
-			location: place,
-			url: url,
-		});
+		const icalEvent = calendar.createEvent(event);
 
-		setAlarms(url, icalEvent);
+		setAlarms(event.url, icalEvent);
 	});
 
 	return calendar;

@@ -34,13 +34,13 @@ export interface CalendarGenerationOptions {
 }
 
 export interface EventData {
-	startDate: Date;
-	endDate: Date;
+	start: Date;
+	end: Date;
 	description: string;
 	summary: string;
 	url: string;
-	uid: string;
-	place: string;
+	id: string;
+	location: string;
 }
 
 export type URLDetails = {
@@ -51,7 +51,7 @@ export type URLDetails = {
 };
 
 export interface CalendarEvent {
-	uid: string;
+	id: string;
 	type: "VEVENT";
 	summary: string;
 	start: Date;

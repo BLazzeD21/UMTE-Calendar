@@ -1,8 +1,9 @@
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![Playwright](https://img.shields.io/badge/-playwright-%232EAD33?style=for-the-badge&logo=playwright&logoColor=white) ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white) ![PM2](https://img.shields.io/badge/PM2-24036f?style=for-the-badge&logo=pm2) ![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white) 
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![Playwright](https://img.shields.io/badge/-playwright-%232EAD33?style=for-the-badge&logo=playwright&logoColor=white) ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white) ![PM2](https://img.shields.io/badge/PM2-24036f?style=for-the-badge&logo=pm2) ![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white)
 
 # 💻 Transferring the UTME schedule to an `ics` calendar
 
 ## Script installation instructions
+
 ### 1. Cloning a repository
 
 The script will require a VPS or VDS server with a minimum version of **Ubuntu 20.04.6 LTS** for stable operation of the program.
@@ -57,6 +58,7 @@ In the **UMTE-Calendar** directory you need to create a `.env` file containing t
 UMTE_USERNAME=username
 UMTE_PASSWORD=password
 ```
+
 ### 2. Start an app
 
 Using pm2 to run the script. PM2 is a daemon process manager that will help you manage and keep your application online.
@@ -66,51 +68,51 @@ The latest PM2 version is installable with NPM:
 ```bash
 npm install pm2@latest -g
 ```
+
 #### Starting and Managing Processes
 
-| **Action**                  | **Description**                              | **Command**                  |
-|-----------------------------|----------------------------------------------|------------------------------|
-| **Start Process**            | Start the app with the name `UMTE-schedule` using all CPU cores       | `npm run start`                            |
-|                             | Script in `package.json`:                                            |                                            |
-|                             | ```"start": "npm run build && pm2 start build/index.js --name UMTE-schedule --time -i max"``` |                                            |
-| **Stop Process**             | Stop the running process                                              | `npm run stop`                             |
-|                             | Script in `package.json`:                                            | ```"stop": "pm2 stop UMTE-schedule"```      |
-| **Reload Process**           | Reload the process without downtime                                  | `npm run reload`                           |
-|                             | Script in `package.json`:                                            | ```"reload": "pm2 reload UMTE-schedule"```  |
-| **Delete Process**           | Remove the process from PM2                                           | `npm run delete`                           |
-|                             | Script in `package.json`:                                            | ```"delete": "pm2 delete UMTE-schedule"```  |
+| **Action**         | **Description**                                                                           | **Command**                            |
+| ------------------ | ----------------------------------------------------------------------------------------- | -------------------------------------- |
+| **Start Process**  | Start the app with the name `UMTE-schedule` using all CPU cores                           | `npm run start`                        |
+|                    | Script in `package.json`:                                                                 |                                        |
+|                    | `"start": "npm run build && pm2 start build/index.js --name UMTE-schedule --time -i max"` |                                        |
+| **Stop Process**   | Stop the running process                                                                  | `npm run stop`                         |
+|                    | Script in `package.json`:                                                                 | `"stop": "pm2 stop UMTE-schedule"`     |
+| **Reload Process** | Reload the process without downtime                                                       | `npm run reload`                       |
+|                    | Script in `package.json`:                                                                 | `"reload": "pm2 reload UMTE-schedule"` |
+| **Delete Process** | Remove the process from PM2                                                               | `npm run delete`                       |
+|                    | Script in `package.json`:                                                                 | `"delete": "pm2 delete UMTE-schedule"` |
 
 #### Monitoring Processes
 
-| **Action**                  | **Description**                              | **Command**                  |
-|-----------------------------|----------------------------------------------|------------------------------|
-| **List Processes**           | Display all running processes                 | `pm2 list`                    |
-| **Detailed Information**     | Show detailed information about the process   | `pm2 describe UMTE-schedule`   |
-| **Real-Time Monitoring**     | Monitor system resources and processes in real-time | `pm2 monit`               |
-
+| **Action**               | **Description**                                     | **Command**                  |
+| ------------------------ | --------------------------------------------------- | ---------------------------- |
+| **List Processes**       | Display all running processes                       | `pm2 list`                   |
+| **Detailed Information** | Show detailed information about the process         | `pm2 describe UMTE-schedule` |
+| **Real-Time Monitoring** | Monitor system resources and processes in real-time | `pm2 monit`                  |
 
 #### Viewing Logs
 
-| **Action**                  | **Description**                              | **Command**                 |
-|-----------------------------|----------------------------------------------|------------------------------|
-| **View All Logs**           | Show all logs                                | `pm2 logs`                   |
-| **View Process Logs**       | View logs for a specific process              | `pm2 logs UMTE-schedule`      |
-| **View Errors**             | Show only error logs                         | `pm2 logs --err`              |
-| **Clear Logs**              | Clear all logs                               | `pm2 flush`                   |
+| **Action**            | **Description**                  | **Command**              |
+| --------------------- | -------------------------------- | ------------------------ |
+| **View All Logs**     | Show all logs                    | `pm2 logs`               |
+| **View Process Logs** | View logs for a specific process | `pm2 logs UMTE-schedule` |
+| **View Errors**       | Show only error logs             | `pm2 logs --err`         |
+| **Clear Logs**        | Clear all logs                   | `pm2 flush`              |
 
 #### Auto Start on Server Reboot
 
-| **Action**                   | **Description**                                      | **Command**                 |
-|------------------------------|------------------------------------------------------|------------------------------|
-| **Enable Auto Start**         | Set up auto start for processes on server reboot      | `pm2 startup`                |
-| **Save Process List**         | Save the current process list for auto start          | `pm2 save`                   |
+| **Action**            | **Description**                                  | **Command**   |
+| --------------------- | ------------------------------------------------ | ------------- |
+| **Enable Auto Start** | Set up auto start for processes on server reboot | `pm2 startup` |
+| **Save Process List** | Save the current process list for auto start     | `pm2 save`    |
 
 #### Updating Processes After Code Changes
 
-| **Action**                    | **Description**                                    | **Command**                        |
-|-------------------------------|----------------------------------------------------|-------------------------------------|
-| **Reload Single Process**      | Reload the process after code changes               | `pm2 reload UMTE-schedule`           |
-| **Reload All Processes**       | Reload all running processes                        | `pm2 reload all`                    |
+| **Action**                | **Description**                       | **Command**                |
+| ------------------------- | ------------------------------------- | -------------------------- |
+| **Reload Single Process** | Reload the process after code changes | `pm2 reload UMTE-schedule` |
+| **Reload All Processes**  | Reload all running processes          | `pm2 reload all`           |
 
 After running the script, a `calendar.ics` file will appear in the `/UMTE-Calendar/calendar` directory, which will contain a calendar that can be used for various purposes.
 
@@ -130,7 +132,7 @@ sudo ln -s /home/UMTE-Calendar/calendar/calendar.ics /var/www/html/calendar.ics
 
 Open the nginx configuration file for editing:
 
-```sudo nano /etc/nginx/sites-available/default```
+`sudo nano /etc/nginx/sites-available/default`
 
 To serve then `calendar.ics` file, you need to modify the configuration:
 
@@ -182,15 +184,3 @@ Server: nginx/1.18.0 (Ubuntu)
 ```
 
 Now, the file `calendar.ics` should be available at `http://yourdomain.com/calendar.ics`.
-
-
-
-
-
-
-
-
-
-
-
-
