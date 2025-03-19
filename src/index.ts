@@ -66,7 +66,7 @@ const main = async () => {
 
 	await promises.mkdir(dirname, { recursive: true });
 
-	startScript();
+	await startScript();
 
 	setTimeout(
 		() => {
