@@ -1,6 +1,6 @@
 {
 	"name": "umte-calendar",
-	"version": "1.2.5",
+	"version": "1.2.6",
 	"description": "UTME Portal Integration with Apple Calendar",
 	"main": "index.js",
 	"type": "module",
