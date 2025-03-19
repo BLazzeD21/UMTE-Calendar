@@ -32,7 +32,7 @@ export const updateCalendar = async (calendarFile: string, schedule: ClassSchedu
 	const totalEventsLength = oldEventsLength + parsedEventsLength;
 
 	log(
-		`Old events: ${oldEventsLength} | Parsed events: ${parsedEventsLength} | Total events: ${totalEventsLength}`,
+		`Old events: ${oldEventsLength} | New events: ${parsedEventsLength} | Total events: ${totalEventsLength}`,
 		"blue",
 	);
 
