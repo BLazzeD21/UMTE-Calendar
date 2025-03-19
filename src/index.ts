@@ -70,10 +70,12 @@ const main = async () => {
 
 	setTimeout(
 		() => {
-			scheduleJob("0 */2 * * *", setScheduleUpdate);
+			scheduleJob("*/30 * * * *", setScheduleUpdate);
 		},
 		120 * 60 * 1000,
 	);
 };
 
-main();
+(async () => {
+	await main();
+})();
