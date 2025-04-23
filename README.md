@@ -25,8 +25,8 @@ git --version
 Go to your home directory and clone the repository:
 
 ```bash
-cd ~/home
-git clone git@github.com:BLazzeD21/UMTE-Calendar.git
+cd /home
+git clone https://github.com/BLazzeD21/UMTE-Calendar.git
 ```
 
 ### 2. Installing dependencies
