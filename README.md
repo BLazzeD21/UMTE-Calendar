@@ -13,7 +13,7 @@ Install git:
 
 ```bash
 sudo apt update && sudo apt upgrade
-sudo apt install git -y
+sudo apt install -y git
 ```
 
 You can confirm that you have installed Git correctly by running the following command and checking that you receive relevant output.
@@ -37,7 +37,7 @@ Check the version of _node.js_ installed on the server:
 node -v
 ```
 
-If the version is lower than _v18.20.6_, then you need to update the node:
+If the version below _v18.20.6_ or _node.js_ is not installed, then you need to install:
 
 ```bash
 sudo apt install -y curl
@@ -73,9 +73,8 @@ npm install pm2@latest -g
 
 | **Action**         | **Description**                                                                           | **Command**                            |
 | ------------------ | ----------------------------------------------------------------------------------------- | -------------------------------------- |
-| **Start Process**  | Start the app with the name `UMTE-schedule` using all CPU cores                           | `npm run start`                        |
-|                    | Script in `package.json`:                                                                 |                                        |
-|                    | `"start": "npm run build && pm2 start build/index.js --name UMTE-schedule --time -i max"` |                                        |
+| **Start Process**  | Run the application named `UTME-schedule` using the desired number of CPU cores specifying them after `-i`, if you want to use all cores use `max` instead of a number                           | `npm run start`                        |
+|                    | Script in `package.json`:                                                                 | `"start": "npm run build && pm2 start build/index.js --name UMTE-schedule --time -i 1"`                                       |
 | **Stop Process**   | Stop the running process                                                                  | `npm run stop`                         |
 |                    | Script in `package.json`:                                                                 | `"stop": "pm2 stop UMTE-schedule"`     |
 | **Reload Process** | Reload the process without downtime                                                       | `npm run reload`                       |
@@ -114,6 +113,13 @@ npm install pm2@latest -g
 | **Reload Single Process** | Reload the process after code changes | `pm2 reload UMTE-schedule` |
 | **Reload All Processes**  | Reload all running processes          | `pm2 reload all`           |
 
+Now let's run the script:
+
+```bash
+npm run start
+```
+
+
 After running the script, a `calendar.ics` file will appear in the `/UMTE-Calendar/calendar` directory, which will contain a calendar that can be used for various purposes.
 
 ### 3. Configuring `nginx`
@@ -121,7 +127,7 @@ After running the script, a `calendar.ics` file will appear in the `/UMTE-Calend
 First, install nginx:
 
 ```bash
-sudo apt install nginx -y
+sudo apt install -y nginx
 ```
 
 Create a symbolic link to the `calendar.ics` file in a directory accessible to nginx. Run the following command:
