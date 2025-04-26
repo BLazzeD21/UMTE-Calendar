@@ -189,3 +189,7 @@ Server: nginx/1.18.0 (Ubuntu)
 ```
 
 Now, the file `calendar.ics` should be available at `http://yourdomain.com/calendar.ics`.
+
+### 5. Ensure secure connection via **https**
+
+If you want to secure Nginx with Let's Encrypt, follow these [instructions](/Let's-Encrypt.md).
