@@ -36,11 +36,11 @@ export interface CalendarGenerationOptions {
 export interface EventData {
 	start: Date;
 	end: Date;
-	description: string;
+	description?: string;
 	summary: string;
-	url: string;
+	url?: string;
 	id: string;
-	location: string;
+	location?: string;
 }
 
 export type URLDetails = {
