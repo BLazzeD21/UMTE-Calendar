@@ -3,7 +3,7 @@ import ical from "node-ical";
 import { CalendarEvent, URLDetails } from "@/types";
 
 export const getCurrentCalendarEvents = (calendarData: string): CalendarEvent[] => {
-	let events: CalendarEvent[] = [];
+	const events: CalendarEvent[] = [];
 
 	const parsedData = ical.parseICS(calendarData);
 

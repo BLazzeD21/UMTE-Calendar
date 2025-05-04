@@ -1,12 +1,15 @@
 import "dotenv/config";
 import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
+import path from "path";
 
-import { generateCalendar, parseSchedule, updateCalendar } from "@/scripts";
+import { generateCalendar, getUpdatedCalendar, parseSchedule } from "@/scripts";
 
 import { getFile, log } from "@/utils";
 
 const dirname = "./calendar";
+
+const CALENDAR_PATH = path.join(process.cwd(), "calendar", "calendar.ics");
 
 const startScript = async () => {
 	const schedule = await parseSchedule({
@@ -19,15 +22,18 @@ const startScript = async () => {
 		return;
 	}
 
-	const calendarFile = await getFile("../../calendar/calendar.ics");
+	const calendarFile = await getFile(CALENDAR_PATH);
 
 	if (calendarFile) {
-		await updateCalendar(calendarFile, schedule);
+		const updatedCalendar = await getUpdatedCalendar(calendarFile, schedule);
+		if (!updatedCalendar) return;
+
+		await promises.writeFile(CALENDAR_PATH, updatedCalendar.toString(), "utf-8");
 	} else {
 		log("No existing calendar found. Generating new calendar...", "yellow");
 		const calendar = await generateCalendar({ schedule });
 		if (calendar) {
-			await promises.writeFile("calendar/calendar.ics", calendar.toString(), "utf-8");
+			await promises.writeFile(CALENDAR_PATH, calendar.toString(), "utf-8");
 			log(`New calendar events: ${schedule.length}`, "blue");
 			log(`New calendar successfully created!`, "green");
 		} else {
@@ -47,15 +53,17 @@ const setScheduleUpdate = async () => {
 		return;
 	}
 
-	const calendarFile = await getFile("../../calendar/calendar.ics");
+	const calendarFile = await getFile(CALENDAR_PATH);
 
 	if (!calendarFile) {
 		log("Existing calendar not found. Skipping update...", "yellow");
 		return;
 	}
 
-	await updateCalendar(calendarFile, schedule);
-	await promises.writeFile("calendar/calendar.ics", calendarFile.toString(), "utf-8");
+	const updatedCalendar = await getUpdatedCalendar(calendarFile, schedule);
+	if (!updatedCalendar) return;
+
+	await promises.writeFile(CALENDAR_PATH, updatedCalendar.toString(), "utf-8");
 };
 
 const main = async () => {

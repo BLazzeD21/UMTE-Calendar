@@ -1,13 +1,15 @@
-import { promises } from "fs";
 import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
 import { getCurrentCalendarEvents } from "@/scripts";
 
-import { getNewEvents, getOldEvents, log, setOldCalendarEvents } from "@/utils";
+import { getNewEvents, getOldEvents, log, setCalendarEvents } from "@/utils";
 
 import { ClassSchedule } from "@/types";
 
-export const updateCalendar = async (calendarFile: string, schedule: ClassSchedule): Promise<void> => {
+export const getUpdatedCalendar = async (
+	calendarFile: string,
+	schedule: ClassSchedule,
+): Promise<ICalCalendar | null> => {
 	log("Existing calendar file found. Updating...", "cyan");
 	const calendarEvents = getCurrentCalendarEvents(calendarFile);
 	const oldCalendarEvents = getOldEvents(calendarEvents);
@@ -22,14 +24,15 @@ export const updateCalendar = async (calendarFile: string, schedule: ClassSchedu
 
 	if (!oldCalendarEvents.length || !newCalendarEvents.length) {
 		log("There are no old events.", "red");
-		return;
+		return null;
 	}
-	await setOldCalendarEvents(oldCalendarEvents, newCalendarEvents, calendar);
 
-	await promises.writeFile("calendar/calendar.ics", calendar.toString(), "utf-8");
+	calendar.clear();
+
+	await setCalendarEvents(oldCalendarEvents, newCalendarEvents, calendar);
 
 	const [oldEventsLength, parsedEventsLength] = [oldCalendarEvents.length, newCalendarEvents.length];
-	const totalEventsLength = oldEventsLength + parsedEventsLength;
+	const totalEventsLength = calendar.length();
 
 	log(
 		`Old events: ${oldEventsLength} | New events: ${parsedEventsLength} | Total events: ${totalEventsLength}`,
@@ -37,4 +40,6 @@ export const updateCalendar = async (calendarFile: string, schedule: ClassSchedu
 	);
 
 	log(`Calendar successfully updated!`, "green");
+
+	return calendar;
 };

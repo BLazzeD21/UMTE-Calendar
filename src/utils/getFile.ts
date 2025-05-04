@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, { promises } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -16,7 +16,7 @@ export const getFile = async (filePath: string): Promise<string | null> => {
 			return null;
 		}
 
-		const fileData = fs.promises.readFile(fullPath, "utf-8");
+		const fileData = await promises.readFile(fullPath, "utf-8");
 
 		return fileData;
 	} catch (error) {
