@@ -11,6 +11,8 @@ const dirname = "./calendar";
 
 const CALENDAR_PATH = path.join(process.cwd(), "calendar", "calendar.ics");
 
+const SCHEDULER_DELAY = 60 * 60 * 1000; // 1 hour
+
 const startScript = async () => {
 	const schedule = await parseSchedule({
 		username: process.env.UMTE_USERNAME,
@@ -76,12 +78,9 @@ const main = async () => {
 
 	await startScript();
 
-	setTimeout(
-		() => {
-			scheduleJob("*/30 * * * *", setScheduleUpdate);
-		},
-		120 * 60 * 1000,
-	);
+	setTimeout(() => {
+		scheduleJob("*/60 * * * *", setScheduleUpdate);
+	}, SCHEDULER_DELAY);
 };
 
 (async () => {
