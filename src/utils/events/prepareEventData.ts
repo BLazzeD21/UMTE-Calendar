@@ -14,10 +14,17 @@ export const prepareEventData = ({ scheduleItem }: { scheduleItem: ScheduleEntry
 
 	const description = `Lecturer: ${subject.lecturer}\nClass type: ${subject.type}\nLocation: ${place}`;
 
-	const summary = `${classNumber}. ${subject.name}`;
+	const types = subject.type.split(", ");
+
+	let prefix = "";
+
+	if (types.includes("вебинар")) prefix = "🖥 ";
+	if (types.includes("экзамен")) prefix = "🏆 ";
+
+	const summary = `${classNumber}. ${prefix}${subject.name}`;
 	const url = subject.webinarLink || null;
 
-	const id = `${classNumber}-${subject.name}-${date.year}${date.month}${date.day}@umte`;
+	const id = `${classNumber}-${subject.name}-${date.year}${date.month}${date.day}@umte1`;
 
 	return { start, end, description, summary, url, id, location: place };
 };
