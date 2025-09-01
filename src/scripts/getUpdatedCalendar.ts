@@ -22,8 +22,8 @@ export const getUpdatedCalendar = async (
 		timezone: "Europe/Moscow",
 	});
 
-	if (!oldCalendarEvents.length || !newCalendarEvents.length) {
-		log("There are no old events.", "red");
+	if (!oldCalendarEvents.length && !newCalendarEvents.length) {
+		log("There are no events.", "red");
 		return null;
 	}
 
