@@ -11,9 +11,13 @@ export const getUpdatedCalendar = async (
 	schedule: ClassSchedule,
 ): Promise<ICalCalendar | null> => {
 	log("Existing calendar file found. Updating...", "cyan");
+
+	const todayTimestamp = new Date();
+	todayTimestamp.setHours(0, 0, 0, 0);
+
 	const calendarEvents = getCurrentCalendarEvents(calendarFile);
-	const oldCalendarEvents = getOldEvents(calendarEvents);
-	const newCalendarEvents = getNewEvents(schedule);
+	const oldCalendarEvents = getOldEvents(calendarEvents, todayTimestamp);
+	const newCalendarEvents = getNewEvents(schedule, todayTimestamp);
 
 	const calendar: ICalCalendar = ical({
 		name: "UMTE",

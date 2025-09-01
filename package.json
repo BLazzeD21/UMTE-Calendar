@@ -38,7 +38,7 @@
 		"tsc-alias": "^1.8.10"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.26.0",
+		"@eslint/js": "^9.28.0",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/node": "^22.13.1",
 		"@types/node-schedule": "^2.1.7",
