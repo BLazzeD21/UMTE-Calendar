@@ -4,48 +4,9 @@ import { scheduleJob } from "node-schedule";
 
 import { CONFIG } from "@/config";
 
-import { backup, generateCalendar, getUpdatedCalendar, parseSchedule } from "@/scripts";
+import { createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
-import { getFile, hasICSChanges, log } from "@/utils";
-
-import { ClassSchedule } from "@/types";
-
-const updateCalendar = async (schedule: ClassSchedule, existingFile: string) => {
-	const updatedCalendar = await getUpdatedCalendar(existingFile, schedule);
-	if (!updatedCalendar) return;
-
-	const hasChanges = await hasICSChanges(updatedCalendar.toString(), CONFIG.files.calendar);
-
-	if (!hasChanges) {
-		const existingBackup = await getFile(CONFIG.files.backupActual.path);
-		if (!existingBackup) {
-			await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
-		}
-		log("No changes detected, update skipped", "gray");
-		return;
-	}
-
-	await promises.writeFile(CONFIG.files.calendar, updatedCalendar.toString(), "utf-8").then(async () => {
-		log("Calendar successfully updated!", "green");
-
-		await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
-	});
-};
-
-const createCalendar = async (schedule: ClassSchedule) => {
-	const calendar = await generateCalendar({ schedule });
-	if (!calendar) {
-		log("Error generating calendar.", "red");
-		return;
-	}
-
-	await promises.writeFile(CONFIG.files.calendar, calendar.toString(), "utf-8").then(async () => {
-		log(`New calendar events: ${schedule.length}`, "blue");
-		log("New calendar successfully created!", "green");
-
-		await backup(calendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
-	});
-};
+import { getFile, log } from "@/utils";
 
 const runOnce = async () => {
 	const schedule = await parseSchedule({

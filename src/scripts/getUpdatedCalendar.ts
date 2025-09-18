@@ -10,7 +10,7 @@ export const getUpdatedCalendar = async (
 	calendarFile: string,
 	schedule: ClassSchedule,
 ): Promise<ICalCalendar | null> => {
-	log("Existing calendar file found. Updating...", "cyan");
+	log("Existing calendar file found. Transform...", "cyan");
 
 	const todayTimestamp = new Date();
 	todayTimestamp.setHours(0, 0, 0, 0);
