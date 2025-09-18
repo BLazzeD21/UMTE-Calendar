@@ -3,11 +3,12 @@ import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
 import path from "path";
 
-import { generateCalendar, getUpdatedCalendar, parseSchedule } from "@/scripts";
+import { backup, generateCalendar, getUpdatedCalendar, parseSchedule } from "@/scripts";
 
 import { getFile, log } from "@/utils";
 
-const dirname = "./calendar";
+const DIRNAME_CALENDAR = "./calendar";
+const DIRNAME_BACKUP = "./backup";
 
 const CALENDAR_PATH = path.join(process.cwd(), "calendar", "calendar.ics");
 
@@ -31,11 +32,14 @@ const startScript = async () => {
 		if (!updatedCalendar) return;
 
 		await promises.writeFile(CALENDAR_PATH, updatedCalendar.toString(), "utf-8");
+
+		await backup(updatedCalendar);
 	} else {
 		log("No existing calendar found. Generating new calendar...", "yellow");
 		const calendar = await generateCalendar({ schedule });
 		if (calendar) {
 			await promises.writeFile(CALENDAR_PATH, calendar.toString(), "utf-8");
+			await backup(calendar);
 			log(`New calendar events: ${schedule.length}`, "blue");
 			log(`New calendar successfully created!`, "green");
 		} else {
@@ -66,6 +70,7 @@ const setScheduleUpdate = async () => {
 	if (!updatedCalendar) return;
 
 	await promises.writeFile(CALENDAR_PATH, updatedCalendar.toString(), "utf-8");
+	await backup(updatedCalendar);
 };
 
 const main = async () => {
@@ -74,7 +79,8 @@ const main = async () => {
 		return;
 	}
 
-	await promises.mkdir(dirname, { recursive: true });
+	await promises.mkdir(DIRNAME_CALENDAR, { recursive: true });
+	await promises.mkdir(DIRNAME_BACKUP, { recursive: true });
 
 	await startScript();
 
