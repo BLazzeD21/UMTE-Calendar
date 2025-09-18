@@ -12,7 +12,7 @@ export const getFile = async (filePath: string): Promise<string | null> => {
 
 	try {
 		if (!fs.existsSync(fullPath)) {
-			log(`Error: File not found at ${filePath}`, "red");
+			log(`Warning: File not found at ${filePath}`, "yellow");
 			return null;
 		}
 

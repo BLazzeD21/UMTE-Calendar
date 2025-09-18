@@ -43,7 +43,5 @@ export const getUpdatedCalendar = async (
 		"blue",
 	);
 
-	log(`Calendar successfully updated!`, "green");
-
 	return calendar;
 };

@@ -2,13 +2,14 @@ import { existsSync, promises } from "fs";
 import { ICalCalendar } from "ical-generator";
 import path from "path";
 
-import { compareICSFiles, log } from "@/utils";
+import { log } from "@/utils";
 
-const BACKUP_DIR = path.join(process.cwd(), "backup");
-const ACTUAL_CALENDAR_NAME = "ActualCalendar.ics";
-const ACTUAL_CALENDAR_PATH = path.join(BACKUP_DIR, ACTUAL_CALENDAR_NAME);
-
-export const backup = async (calendar: ICalCalendar): Promise<void> => {
+export const backup = async (
+	calendar: ICalCalendar,
+	ACTUAL_CALENDAR_PATH: string,
+	ACTUAL_CALENDAR_NAME: string,
+	BACKUP_DIR: string,
+): Promise<void> => {
 	try {
 		const calendarContent = calendar.toString();
 		const isExistActual = existsSync(ACTUAL_CALENDAR_PATH);
@@ -16,14 +17,6 @@ export const backup = async (calendar: ICalCalendar): Promise<void> => {
 		if (!isExistActual) {
 			await promises.writeFile(ACTUAL_CALENDAR_PATH, calendarContent, "utf-8");
 			log(`The current calendar has been saved: ${ACTUAL_CALENDAR_NAME}`, "purple");
-			return;
-		}
-
-		const existingCalendarContent = await promises.readFile(ACTUAL_CALENDAR_PATH, "utf-8");
-
-		const hasChanges = !compareICSFiles(calendarContent, existingCalendarContent);
-		if (!hasChanges) {
-			log("No changes detected, skipping backup", "gray");
 			return;
 		}
 

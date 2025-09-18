@@ -1,20 +1,53 @@
 import "dotenv/config";
 import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
-import path from "path";
+
+import { CONFIG } from "@/config";
 
 import { backup, generateCalendar, getUpdatedCalendar, parseSchedule } from "@/scripts";
 
-import { getFile, log } from "@/utils";
+import { getFile, hasICSChanges, log } from "@/utils";
 
-const DIRNAME_CALENDAR = "./calendar";
-const DIRNAME_BACKUP = "./backup";
+import { ClassSchedule } from "@/types";
 
-const CALENDAR_PATH = path.join(process.cwd(), "calendar", "calendar.ics");
+const updateCalendar = async (schedule: ClassSchedule, existingFile: string) => {
+	const updatedCalendar = await getUpdatedCalendar(existingFile, schedule);
+	if (!updatedCalendar) return;
 
-const SCHEDULER_DELAY = 60 * 60 * 1000; // 1 hour
+	const hasChanges = await hasICSChanges(updatedCalendar.toString(), CONFIG.files.calendar);
 
-const startScript = async () => {
+	if (!hasChanges) {
+		const existingBackup = await getFile(CONFIG.files.backupActual.path);
+		if (!existingBackup) {
+			await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
+		}
+		log("No changes detected, update skipped", "gray");
+		return;
+	}
+
+	await promises.writeFile(CONFIG.files.calendar, updatedCalendar.toString(), "utf-8").then(async () => {
+		log("Calendar successfully updated!", "green");
+
+		await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
+	});
+};
+
+const createCalendar = async (schedule: ClassSchedule) => {
+	const calendar = await generateCalendar({ schedule });
+	if (!calendar) {
+		log("Error generating calendar.", "red");
+		return;
+	}
+
+	await promises.writeFile(CONFIG.files.calendar, calendar.toString(), "utf-8").then(async () => {
+		log(`New calendar events: ${schedule.length}`, "blue");
+		log("New calendar successfully created!", "green");
+
+		await backup(calendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
+	});
+};
+
+const runOnce = async () => {
 	const schedule = await parseSchedule({
 		username: process.env.UMTE_USERNAME,
 		password: process.env.UMTE_PASSWORD,
@@ -25,30 +58,16 @@ const startScript = async () => {
 		return;
 	}
 
-	const calendarFile = await getFile(CALENDAR_PATH);
-
-	if (calendarFile) {
-		const updatedCalendar = await getUpdatedCalendar(calendarFile, schedule);
-		if (!updatedCalendar) return;
-
-		await promises.writeFile(CALENDAR_PATH, updatedCalendar.toString(), "utf-8");
-
-		await backup(updatedCalendar);
+	const existingFile = await getFile(CONFIG.files.calendar);
+	if (existingFile) {
+		await updateCalendar(schedule, existingFile);
 	} else {
 		log("No existing calendar found. Generating new calendar...", "yellow");
-		const calendar = await generateCalendar({ schedule });
-		if (calendar) {
-			await promises.writeFile(CALENDAR_PATH, calendar.toString(), "utf-8");
-			await backup(calendar);
-			log(`New calendar events: ${schedule.length}`, "blue");
-			log(`New calendar successfully created!`, "green");
-		} else {
-			log("Error generating calendar.", "red");
-		}
+		await createCalendar(schedule);
 	}
 };
 
-const setScheduleUpdate = async () => {
+const scheduledUpdate = async () => {
 	const schedule = await parseSchedule({
 		username: process.env.UMTE_USERNAME,
 		password: process.env.UMTE_PASSWORD,
@@ -59,18 +78,13 @@ const setScheduleUpdate = async () => {
 		return;
 	}
 
-	const calendarFile = await getFile(CALENDAR_PATH);
-
-	if (!calendarFile) {
+	const existingFile = await getFile(CONFIG.files.calendar);
+	if (!existingFile) {
 		log("Existing calendar not found. Skipping update...", "yellow");
 		return;
 	}
 
-	const updatedCalendar = await getUpdatedCalendar(calendarFile, schedule);
-	if (!updatedCalendar) return;
-
-	await promises.writeFile(CALENDAR_PATH, updatedCalendar.toString(), "utf-8");
-	await backup(updatedCalendar);
+	await updateCalendar(schedule, existingFile);
 };
 
 const main = async () => {
@@ -79,14 +93,14 @@ const main = async () => {
 		return;
 	}
 
-	await promises.mkdir(DIRNAME_CALENDAR, { recursive: true });
-	await promises.mkdir(DIRNAME_BACKUP, { recursive: true });
+	await promises.mkdir(CONFIG.dirs.calendar, { recursive: true });
+	await promises.mkdir(CONFIG.dirs.backup, { recursive: true });
 
-	await startScript();
+	await runOnce();
 
 	setTimeout(() => {
-		scheduleJob("*/60 * * * *", setScheduleUpdate);
-	}, SCHEDULER_DELAY);
+		scheduleJob("*/60 * * * *", scheduledUpdate);
+	}, CONFIG.schedulerDelay);
 };
 
 (async () => {
