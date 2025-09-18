@@ -24,5 +24,6 @@ export const createICalEvent = (
 		location,
 		url,
 	});
-	setAlarms(url || "", icalEvent);
+
+	setAlarms(icalEvent);
 };

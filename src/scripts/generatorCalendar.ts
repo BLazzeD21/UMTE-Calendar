@@ -17,7 +17,7 @@ export const generateCalendar = async ({ schedule }: CalendarGenerationOptions):
 
 		const icalEvent = calendar.createEvent(event);
 
-		setAlarms(event.url, icalEvent);
+		setAlarms(icalEvent);
 	});
 
 	return calendar;
