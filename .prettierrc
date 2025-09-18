@@ -10,7 +10,7 @@
 	"arrowParens": "always",
 	"requirePragma": false,
 	"plugins": ["@trivago/prettier-plugin-sort-imports"],
-	"importOrder": ["<THIRD_PARTY_MODULES>", "^@/scripts", "^@/utils", "^@/types", "^[./]"],
+	"importOrder": ["<THIRD_PARTY_MODULES>", "^@/config", "^@/scripts", "^@/utils", "^@/types", "^[./]"],
 	"importOrderSeparation": true,
 	"importOrderSortSpecifiers": true,
 	"importOrderCaseInsensitive": true
