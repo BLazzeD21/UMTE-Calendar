@@ -8,9 +8,13 @@ import { getFile, hasICSChanges, log } from "@/utils";
 
 import { ClassSchedule } from "@/types";
 
+import { lexicon } from "@/lexicon";
+
+import { TelegramBot } from "@/bot";
+
 import { getUpdatedCalendar } from "./getUpdatedCalendar";
 
-export const updateCalendar = async (schedule: ClassSchedule, existingFile: string) => {
+export const updateCalendar = async (schedule: ClassSchedule, existingFile: string, bot: TelegramBot) => {
 	const updatedCalendar = await getUpdatedCalendar(existingFile, schedule);
 	if (!updatedCalendar) return;
 
@@ -23,6 +27,10 @@ export const updateCalendar = async (schedule: ClassSchedule, existingFile: stri
 		}
 		log("No changes detected, update skipped", "gray");
 		return;
+	}
+
+	if (hasChanges && bot != null) {
+		bot.sendMessage(lexicon.message);
 	}
 
 	await promises.writeFile(CONFIG.files.calendar, updatedCalendar.toString(), "utf-8").then(async () => {
