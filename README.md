@@ -193,3 +193,22 @@ Now, the file `calendar.ics` should be available at `http://yourdomain.com/calen
 ### 5. Ensure secure connection via **https**
 
 If you want to secure Nginx with Let's Encrypt, follow these [instructions](/Let's-Encrypt.md).
+
+### 5. Notifications about changes via a Telegram bot
+
+The Telegram bot is disabled by default. To enable notifications, create a bot using [@BotFather](https://telegram.me/BotFather). You will receive a token to access the HTTP Telegram API. You will also need the **CHAT_ID** where the bot's messages will be sent, or the **CHAT_ID** and **TOPIC_ID** if you have topics enabled in the conversation.
+
+Configuration data you must add to `.env`.
+
+```bash
+TELEGRAM_BOT_TOKEN=Token from BotFather
+CHAT_ID=Telegram chat ID
+TOPIC_ID=Telegram chat topic ID
+```
+
+If you don't have any topics in your chat, don't add **TOPIC_ID**.
+
+> [!IMPORTANT]
+> In order for the bot to be able to send messages to the specified chat ID, it must be added to this chat.
+
+After filling in `.env` and adding the **bot** to the chat, the bot will work correctly and send messages _every time the schedule changes_.
