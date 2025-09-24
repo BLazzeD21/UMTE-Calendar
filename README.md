@@ -194,9 +194,9 @@ Now, the file `calendar.ics` should be available at `http://yourdomain.com/calen
 
 If you want to secure Nginx with Let's Encrypt, follow these [instructions](/Let's-Encrypt.md).
 
-### 5. Notifications about changes via a Telegram bot
+### 5. Schedule change notifications via Telegram bot
 
-The Telegram bot is disabled by default. To enable notifications, create a bot using [@BotFather](https://telegram.me/BotFather). You will receive a token to access the HTTP Telegram API. You will also need the **CHAT_ID** where the bot's messages will be sent, or the **CHAT_ID** and **TOPIC_ID** if you have topics enabled in the conversation.
+The Telegram bot is disabled by default. To enable notifications, create a bot using [@BotFather](https://telegram.me/BotFather). You will receive a token to access the HTTP Telegram API. You will also need the **CHAT_ID** where the bot's messages will be sent, or the **CHAT_ID** and **TOPIC_ID** if you have topics enabled in the group.
 
 Configuration data you must add to `.env`.
 
