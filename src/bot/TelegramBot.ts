@@ -3,6 +3,8 @@ import { ParseMode } from "grammy/types";
 
 import { log } from "@/utils";
 
+import { lexicon } from "@/lexicon";
+
 const PARSE_MODE = "HTML";
 
 interface TelegramBotOptions {
@@ -31,9 +33,9 @@ export class TelegramBot {
 	}
 
 	public start() {
-		log("Bot: Starting...", "purple");
+		log(lexicon.log.botStarting, "purple");
 		this.bot.start().catch((err) => {
-			log(`Bot: Error starting the bot - ${err}`, "red");
+			log(`${lexicon.log.botErrorStarting} - ${err}`, "red");
 		});
 	}
 
@@ -69,10 +71,10 @@ export class TelegramBot {
 		return this.bot.api
 			.sendMessage(this.chatId, message, options)
 			.then(() => {
-				log("Bot: The message has been sent successfully", "purple");
+				log(lexicon.log.messageSentSuccessfully, "purple");
 			})
 			.catch((error) => {
-				log(`Bot: Error sending message: ${error}`, "red");
+				log(`${lexicon.log.errorSendingMessage}: ${error}`, "red");
 			});
 	}
 }

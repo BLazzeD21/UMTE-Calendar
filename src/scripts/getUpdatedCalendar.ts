@@ -6,11 +6,13 @@ import { getNewEvents, getOldEvents, log, setCalendarEvents } from "@/utils";
 
 import { ClassSchedule } from "@/types";
 
+import { lexicon } from "@/lexicon";
+
 export const getUpdatedCalendar = async (
 	calendarFile: string,
 	schedule: ClassSchedule,
 ): Promise<ICalCalendar | null> => {
-	log("Existing calendar file found. Transform...", "cyan");
+	log(lexicon.log.existingCalendarTransform, "cyan");
 
 	const todayTimestamp = new Date();
 	todayTimestamp.setHours(0, 0, 0, 0);
@@ -27,7 +29,7 @@ export const getUpdatedCalendar = async (
 	});
 
 	if (!oldCalendarEvents.length && !newCalendarEvents.length) {
-		log("There are no events.", "red");
+		log(lexicon.log.noEventsFound, "red");
 		return null;
 	}
 
@@ -38,10 +40,7 @@ export const getUpdatedCalendar = async (
 	const [oldEventsLength, parsedEventsLength] = [oldCalendarEvents.length, newCalendarEvents.length];
 	const totalEventsLength = calendar.length();
 
-	log(
-		`Old events: ${oldEventsLength} | New events: ${parsedEventsLength} | Total events: ${totalEventsLength}`,
-		"blue",
-	);
+	log(lexicon.log.calendarStats(oldEventsLength, parsedEventsLength, totalEventsLength), "blue");
 
 	return calendar;
 };

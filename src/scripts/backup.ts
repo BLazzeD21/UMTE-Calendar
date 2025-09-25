@@ -4,6 +4,8 @@ import path from "path";
 
 import { log } from "@/utils";
 
+import { lexicon } from "@/lexicon";
+
 export const backup = async (
 	calendar: ICalCalendar,
 	ACTUAL_CALENDAR_PATH: string,
@@ -16,7 +18,7 @@ export const backup = async (
 
 		if (!isExistActual) {
 			await promises.writeFile(ACTUAL_CALENDAR_PATH, calendarContent, "utf-8");
-			log(`The current calendar has been saved: ${ACTUAL_CALENDAR_NAME}`, "purple");
+			log(lexicon.log.currentCalendarSaved(ACTUAL_CALENDAR_NAME), "purple");
 			return;
 		}
 
@@ -30,12 +32,12 @@ export const backup = async (
 		const backupFilePath = path.join(BACKUP_DIR, backupFileName);
 
 		await promises.rename(ACTUAL_CALENDAR_PATH, backupFilePath);
-		log(`The previous calendar has been saved: ${backupFileName}`, "purple");
+		log(lexicon.log.previousCalendarSaved(backupFileName), "purple");
 
 		await promises.writeFile(ACTUAL_CALENDAR_PATH, calendarContent, "utf-8");
-		log(`The current calendar has been saved: ${ACTUAL_CALENDAR_NAME}`, "purple");
+		log(lexicon.log.currentCalendarSaved(ACTUAL_CALENDAR_NAME), "purple");
 	} catch (error) {
-		log(`Backup failed: ${error.message}`, "red");
+		log(`${lexicon.log.backupFailed}: ${error.message}`, "red");
 		throw error;
 	}
 };

@@ -19,7 +19,7 @@ const runOnce = async (bot: TelegramBot) => {
 	});
 
 	if (!schedule.length) {
-		log("No schedule data found. Exiting...", "red");
+		log(lexicon.log.noScheduleData, "red");
 		return;
 	}
 
@@ -27,7 +27,7 @@ const runOnce = async (bot: TelegramBot) => {
 	if (existingFile) {
 		await updateCalendar(schedule, existingFile, bot);
 	} else {
-		log("No existing calendar found. Generating new calendar...", "yellow");
+		log(lexicon.log.generatingNewCalendar, "yellow");
 		await createCalendar(schedule);
 	}
 };
@@ -39,13 +39,13 @@ const scheduledUpdate = async (bot: TelegramBot) => {
 	});
 
 	if (!schedule.length) {
-		log("No schedule data found. Exiting...", "red");
+		log(lexicon.log.noScheduleData, "red");
 		return;
 	}
 
 	const existingFile = await getFile(CONFIG.files.calendar);
 	if (!existingFile) {
-		log("Existing calendar not found. Skipping update...", "yellow");
+		log(lexicon.log.existingCalendarNotFound, "yellow");
 		return;
 	}
 
@@ -54,7 +54,7 @@ const scheduledUpdate = async (bot: TelegramBot) => {
 
 const main = async () => {
 	if (!process.env.UMTE_USERNAME || !process.env.UMTE_PASSWORD) {
-		log("Missing environment variables. Exiting...", "red");
+		log(lexicon.log.missingEnvVars, "red");
 		return;
 	}
 
@@ -75,7 +75,7 @@ const main = async () => {
 
 		bot.start();
 	} else {
-		log("Bot: launching without a bot...", "purple");
+		log(lexicon.log.launchingWithoutBot, "purple");
 	}
 
 	await promises.mkdir(CONFIG.dirs.calendar, { recursive: true });

@@ -25,7 +25,7 @@ export const updateCalendar = async (schedule: ClassSchedule, existingFile: stri
 		if (!existingBackup) {
 			await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
 		}
-		log("No changes detected, update skipped", "gray");
+		log(lexicon.log.updateSkipped, "gray");
 		return;
 	}
 
@@ -41,7 +41,7 @@ export const updateCalendar = async (schedule: ClassSchedule, existingFile: stri
 	}
 
 	await promises.writeFile(CONFIG.files.calendar, updatedCalendar.toString(), "utf-8").then(async () => {
-		log("Calendar successfully updated!", "green");
+		log(lexicon.log.successfullyUpdated, "green");
 
 		await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
 	});
