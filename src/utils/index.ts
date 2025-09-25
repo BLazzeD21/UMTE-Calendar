@@ -12,3 +12,6 @@ export * from "./events/createICalEvent";
 export * from "./ics/normalizeICS";
 export * from "./ics/compareICSFiles";
 export * from "./ics/hasICSChanges";
+
+export * from "./changes/compareCalendarsJSON";
+export * from "./changes/formatDiffForUser";

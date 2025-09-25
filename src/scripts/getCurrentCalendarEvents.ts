@@ -5,7 +5,7 @@ import { CalendarEvent, URLDetails } from "@/types";
 export const getCurrentCalendarEvents = (calendarData: string): CalendarEvent[] => {
 	const events: CalendarEvent[] = [];
 
-	const parsedData = ical.parseICS(calendarData);
+	const parsedData = ical.sync.parseICS(calendarData);
 
 	for (const key in parsedData) {
 		const event = parsedData[key];

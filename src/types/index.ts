@@ -60,3 +60,16 @@ export interface CalendarEvent {
 	description: string;
 	url?: URLDetails | string;
 }
+
+export interface ChangedEvent {
+	UID: string;
+	summary: string;
+	eventDate: Date;
+	changes: Partial<Record<keyof CalendarEvent, { old: string | Date | undefined; new: string | Date | undefined }>>;
+}
+
+export interface CalendarDiff {
+	removed: CalendarEvent[];
+	added: CalendarEvent[];
+	changed: ChangedEvent[];
+}

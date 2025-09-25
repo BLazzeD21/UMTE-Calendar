@@ -4,7 +4,7 @@ import { CONFIG } from "@/config";
 
 import { backup } from "@/scripts";
 
-import { getFile, hasICSChanges, log } from "@/utils";
+import { compareCalendarsJSON, formatDiffForUser, getFile, hasICSChanges, log } from "@/utils";
 
 import { ClassSchedule } from "@/types";
 
@@ -18,7 +18,7 @@ export const updateCalendar = async (schedule: ClassSchedule, existingFile: stri
 	const updatedCalendar = await getUpdatedCalendar(existingFile, schedule);
 	if (!updatedCalendar) return;
 
-	const hasChanges = await hasICSChanges(updatedCalendar.toString(), CONFIG.files.calendar);
+	const [hasChanges, existingCalendar] = await hasICSChanges(updatedCalendar.toString(), CONFIG.files.calendar);
 
 	if (!hasChanges) {
 		const existingBackup = await getFile(CONFIG.files.backupActual.path);
@@ -30,7 +30,14 @@ export const updateCalendar = async (schedule: ClassSchedule, existingFile: stri
 	}
 
 	if (hasChanges && bot != null) {
-		bot.sendMessage(lexicon.message);
+		const diffJSON = compareCalendarsJSON(existingCalendar.toString(), updatedCalendar.toString());
+
+		const changes = formatDiffForUser(JSON.parse(diffJSON));
+
+		const messageText =
+			lexicon.message(changes).length <= 2000 ? lexicon.message(changes) : lexicon.message(lexicon.lengthExceeded);
+
+		bot.sendMessage(messageText);
 	}
 
 	await promises.writeFile(CONFIG.files.calendar, updatedCalendar.toString(), "utf-8").then(async () => {
