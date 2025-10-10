@@ -12,16 +12,16 @@ export const lexicon = {
 			hour: "2-digit",
 			minute: "2-digit",
 		};
-		const formattedDate = now.toLocaleDateString("ru-RU", options);
 
-		const messageText = `<b>📣 Изменение в расписании ${formattedDate}!</b>\n\n${body}\n<b><a href="https://umeos.ru/my/">umeos</a> • <a href="https://umeos.blazzed.tech/calendar.ics">подписаться на календарь (ics)</a></b>`;
+		const formattedDate = now.toLocaleDateString("ru-RU", options);
+		const messageText = `<b>📣 В вашем расписании произошли изменения!</b>\n\n${body}\n\n📅 <b><a href="https://umeos.ru/my/">umeos</a> • <a href="https://umeos.blazzed.tech/calendar.ics">календарь (ics)</a></b>\n<i><b>Уведомление сгенерировано:</b> ${formattedDate}</i>`;
 
 		return messageText;
 	},
-	lengthExceeded: "<i>Изменения очень большие. Посмотрите расписание!</i>",
-	addedByDate: "✅ Добавлено",
-	removedByDate: "❌ Отменено",
-	changedByDate: "✏️ Изменено",
+	lengthExceeded: "<i>Изменения очень большие. Посмотрите расписание!</i>\n",
+	addedByDate: "✅ Появились новые пары:",
+	removedByDate: "❌ Пары отменены:",
+	changedByDate: "🔄 Изменено:",
 	withoutDate: "без даты",
 	log: {
 		noScheduleData: "No schedule data found. Exiting...",
@@ -53,4 +53,19 @@ export const lexicon = {
 		updateSkipped: "No changes detected, update skipped",
 		successfullyUpdated: "Calendar successfully updated!",
 	},
+	daysOfWeek: ["В воскресенье", "В понедельник", "Во вторник", "В среду", "В четверг", "В пятницу", "В субботу"],
+	months: [
+		"января",
+		"февраля",
+		"марта",
+		"апреля",
+		"мая",
+		"июня",
+		"июля",
+		"августа",
+		"сентября",
+		"октября",
+		"ноября",
+		"декабря",
+	],
 };

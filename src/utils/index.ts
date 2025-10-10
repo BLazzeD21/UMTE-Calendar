@@ -15,3 +15,5 @@ export * from "./ics/hasICSChanges";
 
 export * from "./changes/compareCalendarsJSON";
 export * from "./changes/formatDiffForUser";
+
+export * from "./date/formatDateToRussian";

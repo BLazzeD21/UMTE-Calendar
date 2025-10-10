@@ -2,13 +2,14 @@ import { CalendarDiff, CalendarEvent } from "@/types";
 
 import { lexicon } from "@/lexicon";
 
+import { formatDateToRussian } from "../date/formatDateToRussian";
+
 export function formatDiffForUser(diff: CalendarDiff): string {
 	const addedByDate: Record<string, string[]> = {};
 	const removedByDate: Record<string, string[]> = {};
 	const changedByDate: Record<string, string[]> = {};
 
-	const formatDate = (date?: string | Date | undefined) =>
-		date ? new Date(date).toLocaleDateString("ru-RU") : lexicon.withoutDate;
+	const formatDate = (date?: string | Date | undefined) => (date ? formatDateToRussian(date) : lexicon.withoutDate);
 
 	for (const event of diff.added) {
 		const date = formatDate(event.start);
@@ -33,11 +34,11 @@ export function formatDiffForUser(diff: CalendarDiff): string {
 			if (change) {
 				const oldValue = change.old instanceof Date ? change.old.toLocaleString() : change.old;
 				const newValue = change.new instanceof Date ? change.new.toLocaleString() : change.new;
-				changes.push(`   <i>${oldValue} → ${newValue}</i>`);
+				changes.push(`   📎 <i>${oldValue} → ${newValue}</i>`);
 			}
 		}
 
-		changedByDate[date].push(`➿ ${event.summary}\n${changes.join("\n")}`);
+		changedByDate[date].push(`${event.summary}\n${changes.join("\n")}`);
 	}
 
 	const buildBlock = (title: string, data: Record<string, string[]>) => {

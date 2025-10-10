@@ -16,26 +16,20 @@ export const parseSchedule = async ({
 		const page: Page = await browser.newPage();
 
 		await page.goto("https://umeos.ru/login/index.php");
-		await page.waitForTimeout(500);
 
 		await page.waitForSelector('input[name="username"]');
 		await page.locator('input[name="username"]').fill(username);
-		await page.waitForTimeout(1000);
 
 		await page.waitForSelector('input[name="password"]');
 		await page.locator('input[name="password"]').fill(password);
-		await page.waitForTimeout(1000);
 
-		await page.click("#loginbtn", { delay: 1500 });
+		await page.click("#loginbtn");
 
 		await page.waitForURL("https://umeos.ru/my/", { waitUntil: "load" });
-
-		await page.waitForTimeout(1000);
 
 		await page.goto("https://umeos.ru/blocks/umerasp/schedule.php?t=student");
 
 		await page.waitForSelector("#sched_tabs");
-		await page.waitForTimeout(1000);
 
 		const schedule = await page.$$eval("tbody tr", (rows: HTMLElement[]) => {
 			let currentDate: string;
