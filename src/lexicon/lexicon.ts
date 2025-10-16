@@ -4,17 +4,7 @@ export const lexicon = {
 	replyMessage:
 		"<u>Я не умею отвечать на сообщения</u>. Всё, что я могу — это <b>присылать уведомления об изменении расписания</b> в топик чата, где я состою 😕. \n\n<tg-spoiler>Если хочешь проверить расписание — зайди на портал университета.</tg-spoiler>",
 	message: (body: string) => {
-		const now = new Date();
-		const options: Intl.DateTimeFormatOptions = {
-			day: "2-digit",
-			month: "2-digit",
-			year: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-		};
-
-		const formattedDate = now.toLocaleDateString("ru-RU", options);
-		const messageText = `<b>📣 В вашем расписании произошли изменения!</b>\n\n${body}\n\n📅 <b><a href="https://umeos.ru/my/">umeos</a> • <a href="https://umeos.blazzed.tech/calendar.ics">календарь (ics)</a></b>\n<i><b>Уведомление сгенерировано:</b> ${formattedDate}</i>`;
+		const messageText = `<b>📣 В вашем расписании произошли изменения!</b>\n\n${body}\n\n📅 <b><a href="https://umeos.ru/my/">umeos</a> • <a href="https://umeos.blazzed.tech/calendar.ics">календарь (ics)</a></b>`;
 
 		return messageText;
 	},
