@@ -15,7 +15,10 @@
 		"lint": "npx eslint --fix",
 		"type": "tsc --noEmit",
 		"prettier": "npx prettier . --write",
-		"prepare": "husky"
+		"prepare": "husky",
+		"patch": "npm version patch -m \"version: %s\"",
+		"minor": "npm version minor -m \"version: %s\"",
+		"major": "npm version major -m \"version: %s\""
 	},
 	"repository": {
 		"type": "git",
