@@ -87,5 +87,6 @@ export function compareCalendarsJSON(icsOld: string, icsNew: string): string {
 	}
 
 	const calendarDiff: CalendarDiff = { removed, added, changed };
+
 	return JSON.stringify(calendarDiff, null, 2);
 }
