@@ -1,6 +1,4 @@
-export * from "./colors";
 export * from "./getFile";
-export * from "./log";
 
 export * from "./events/getNewEvents";
 export * from "./events/getOldEvents";
