@@ -2,7 +2,7 @@ import fs, { promises } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { log } from "@/utils";
+import { logger } from "@/config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,7 +12,7 @@ export const getFile = async (filePath: string): Promise<string | null> => {
 
 	try {
 		if (!fs.existsSync(fullPath)) {
-			log(`Warning: File not found at ${filePath}`, "yellow");
+			logger.warn(`Warning: File not found at ${filePath}`);
 			return null;
 		}
 
@@ -20,6 +20,6 @@ export const getFile = async (filePath: string): Promise<string | null> => {
 
 		return fileData;
 	} catch (error) {
-		log(`Error reading file at", ${error}`, "red");
+		logger.error(`Error reading file at", ${error}`);
 	}
 };

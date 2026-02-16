@@ -1,8 +1,10 @@
 import ical, { ICalCalendar, ICalCalendarMethod } from "ical-generator";
 
+import { logger } from "@/config";
+
 import { getCurrentCalendarEvents } from "@/scripts";
 
-import { getNewEvents, getOldEvents, log, setCalendarEvents } from "@/utils";
+import { getNewEvents, getOldEvents, setCalendarEvents } from "@/utils";
 
 import { ClassSchedule } from "@/types";
 
@@ -12,7 +14,7 @@ export const getUpdatedCalendar = async (
 	calendarFile: string,
 	schedule: ClassSchedule,
 ): Promise<ICalCalendar | null> => {
-	log(lexicon.log.existingCalendarTransform, "cyan");
+	logger.info(lexicon.log.existingCalendarTransform);
 
 	const todayTimestamp = new Date();
 	todayTimestamp.setHours(0, 0, 0, 0);
@@ -29,7 +31,7 @@ export const getUpdatedCalendar = async (
 	});
 
 	if (!oldCalendarEvents.length && !newCalendarEvents.length) {
-		log(lexicon.log.noEventsFound, "red");
+		logger.warn(lexicon.log.noEventsFound);
 		return null;
 	}
 
@@ -40,7 +42,7 @@ export const getUpdatedCalendar = async (
 	const [oldEventsLength, parsedEventsLength] = [oldCalendarEvents.length, newCalendarEvents.length];
 	const totalEventsLength = calendar.length();
 
-	log(lexicon.log.calendarStats(oldEventsLength, parsedEventsLength, totalEventsLength), "blue");
+	logger.info(lexicon.log.calendarStats(oldEventsLength, parsedEventsLength, totalEventsLength));
 
 	return calendar;
 };

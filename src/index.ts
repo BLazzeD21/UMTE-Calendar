@@ -2,11 +2,11 @@ import "dotenv/config";
 import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
 
-import { CONFIG } from "@/config";
+import { CONFIG, logger } from "@/config";
 
 import { createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
-import { getFile, log } from "@/utils";
+import { getFile } from "@/utils";
 
 import { lexicon } from "@/lexicon";
 
@@ -19,7 +19,7 @@ const runOnce = async (bot: TelegramBot) => {
 	});
 
 	if (!schedule.length) {
-		log(lexicon.log.noScheduleData, "red");
+		logger.error(lexicon.log.noScheduleData);
 		return;
 	}
 
@@ -27,7 +27,7 @@ const runOnce = async (bot: TelegramBot) => {
 	if (existingFile) {
 		await updateCalendar(schedule, existingFile, bot);
 	} else {
-		log(lexicon.log.generatingNewCalendar, "yellow");
+		logger.warn(lexicon.log.noScheduleData);
 		await createCalendar(schedule);
 	}
 };
@@ -39,13 +39,13 @@ const scheduledUpdate = async (bot: TelegramBot) => {
 	});
 
 	if (!schedule.length) {
-		log(lexicon.log.noScheduleData, "red");
+		logger.error(lexicon.log.noScheduleData);
 		return;
 	}
 
 	const existingFile = await getFile(CONFIG.files.calendar);
 	if (!existingFile) {
-		log(lexicon.log.existingCalendarNotFound, "yellow");
+		logger.warn(lexicon.log.existingCalendarNotFound);
 		return;
 	}
 
@@ -54,7 +54,7 @@ const scheduledUpdate = async (bot: TelegramBot) => {
 
 const main = async () => {
 	if (!process.env.UMTE_USERNAME || !process.env.UMTE_PASSWORD) {
-		log(lexicon.log.missingEnvVars, "red");
+		logger.error(lexicon.log.missingEnvVars);
 		return;
 	}
 
@@ -75,7 +75,7 @@ const main = async () => {
 
 		bot.start();
 	} else {
-		log(lexicon.log.launchingWithoutBot, "purple");
+		logger.warn(lexicon.log.launchingWithoutBot);
 	}
 
 	await promises.mkdir(CONFIG.dirs.calendar, { recursive: true });

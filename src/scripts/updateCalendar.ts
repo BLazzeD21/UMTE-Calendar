@@ -1,10 +1,10 @@
 import { promises } from "fs";
 
-import { CONFIG } from "@/config";
+import { CONFIG, logger } from "@/config";
 
 import { backup } from "@/scripts";
 
-import { compareCalendarsJSON, formatDiffForUser, getFile, hasICSChanges, log } from "@/utils";
+import { compareCalendarsJSON, formatDiffForUser, getFile, hasICSChanges } from "@/utils";
 
 import { ClassSchedule } from "@/types";
 
@@ -25,7 +25,7 @@ export const updateCalendar = async (schedule: ClassSchedule, existingFile: stri
 		if (!existingBackup) {
 			await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
 		}
-		log(lexicon.log.updateSkipped, "gray");
+		logger.info(lexicon.log.updateSkipped);
 		return;
 	}
 
@@ -41,7 +41,7 @@ export const updateCalendar = async (schedule: ClassSchedule, existingFile: stri
 	}
 
 	await promises.writeFile(CONFIG.files.calendar, updatedCalendar.toString(), "utf-8").then(async () => {
-		log(lexicon.log.successfullyUpdated, "green");
+		logger.info(lexicon.log.successfullyUpdated);
 
 		await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
 	});

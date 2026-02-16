@@ -1,7 +1,7 @@
 import { Bot, Context } from "grammy";
 import { ParseMode } from "grammy/types";
 
-import { log } from "@/utils";
+import { logger } from "@/config";
 
 import { lexicon } from "@/lexicon";
 
@@ -33,9 +33,9 @@ export class TelegramBot {
 	}
 
 	public start() {
-		log(lexicon.log.botStarting, "purple");
+		logger.info(lexicon.log.botStarting);
 		this.bot.start().catch((err) => {
-			log(`${lexicon.log.botErrorStarting} - ${err}`, "red");
+			logger.error(`${lexicon.log.botErrorStarting} - ${err}`);
 		});
 	}
 
@@ -71,10 +71,10 @@ export class TelegramBot {
 		return this.bot.api
 			.sendMessage(this.chatId, message, options)
 			.then(() => {
-				log(lexicon.log.messageSentSuccessfully, "purple");
+				logger.info(lexicon.log.messageSentSuccessfully);
 			})
 			.catch((error) => {
-				log(`${lexicon.log.errorSendingMessage}: ${error}`, "red");
+				logger.error(`${lexicon.log.errorSendingMessage}: ${error}`);
 			});
 	}
 }

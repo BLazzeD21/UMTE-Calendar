@@ -1,6 +1,6 @@
 import { Browser, chromium, Page } from "playwright";
 
-import { log } from "@/utils";
+import { logger } from "@/config";
 
 import { ClassSchedule, DateDetails, ScheduleParserOptions, SubjectDetails } from "@/types";
 
@@ -89,7 +89,7 @@ export const parseSchedule = async ({
 		});
 		return schedule;
 	} catch (error) {
-		log(`An error occurred: ${error}`, "red");
+		logger.error(`An error occurred: ${error}`);
 		return [];
 	} finally {
 		if (browser) {
