@@ -31,10 +31,10 @@
 	},
 	"homepage": "https://github.com/BLazzeD21/UMTE-Calendar#readme",
 	"dependencies": {
+		"axios": "^1.13.6",
 		"cross-env": "^10.1.0",
 		"dotenv": "^16.4.7",
 		"grammy": "^1.38.2",
-		"https-proxy-agent": "^8.0.0",
 		"husky": "^9.1.7",
 		"ical-generator": "^8.1.1",
 		"node-ical": "^0.20.1",
