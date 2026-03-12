@@ -60,21 +60,21 @@ export class TelegramBot {
 		const options: {
 			parse_mode: ParseMode;
 			message_thread_id?: number;
-		} = {
-			parse_mode: parseMode,
-		};
+		} = { parse_mode: parseMode };
 
 		if (this.topicId) {
 			options.message_thread_id = this.topicId;
 		}
 
-		return this.bot.api
-			.sendMessage(this.chatId, message, options)
-			.then(() => {
+		for (let attempt = 1; attempt <= 3; attempt++) {
+			try {
+				await this.bot.api.sendMessage(this.chatId, message, options);
 				logger.info(lexicon.log.messageSentSuccessfully);
-			})
-			.catch((error) => {
-				logger.error(`${lexicon.log.errorSendingMessage}: ${error}`);
-			});
+				return;
+			} catch (error) {
+				logger.error(`sendMessage attempt ${attempt} failed`, error);
+				await new Promise((r) => setTimeout(r, 2000));
+			}
+		}
 	}
 }
