@@ -194,7 +194,7 @@ Now, the file `calendar.ics` should be available at `http://yourdomain.com/calen
 
 If you want to secure Nginx with Let's Encrypt, follow these [instructions](/Let's-Encrypt.md).
 
-### 5. Schedule change notifications via Telegram bot
+### 6. Schedule change notifications via Telegram bot
 
 The Telegram bot is disabled by default. To enable notifications, create a bot using [@BotFather](https://telegram.me/BotFather). You will receive a token to access the HTTP Telegram API. You will also need the **CHAT_ID** where the bot's messages will be sent, or the **CHAT_ID** and **TOPIC_ID** if you have topics enabled in the group.
 
@@ -212,3 +212,26 @@ If you don't have any topics in your chat, don't add **TOPIC_ID**.
 > In order for the bot to be able to send messages to the specified chat ID, it must be added to this chat.
 
 After filling in `.env` and adding the **bot** to the chat, the bot will work correctly and send messages _every time the schedule changes_.
+
+### 6. Using a Socks proxy for a Telegram bot
+
+To run the bot with `SocksProxyAgent`, you need to add `PROXY_URL` to `.env` in the format shown below:
+
+```bash
+PROXY_URL=socks5://login:password@host:port
+```
+
+Then, when the application is launched and the agent is successfully checked, the following information message will be displayed:
+
+```bash
+00:17:55 [info]: External IP via proxy: <proxy_ip>
+00:17:55 [info]: Bot: Starting...
+```
+
+If you do not fill in the `PROXY_URL` or the test connection fails, the following will be displayed:
+
+```bash
+# Error will be displayed if the test connection is not successful.
+00:19:44 [error]: Failed to fetch external IP: Error: Socks5 proxy rejected connection - NotAllowed
+00:19:44 [info]: Bot: The bot will be launched without using a proxy
+```
