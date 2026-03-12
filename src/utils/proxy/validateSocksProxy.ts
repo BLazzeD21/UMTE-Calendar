@@ -3,9 +3,11 @@ import { SocksProxyAgent } from "socks-proxy-agent";
 
 import { logger } from "@/config";
 
+import { lexicon } from "@/lexicon";
+
 export async function validateSocksProxy(proxyUrl: string | undefined): Promise<boolean> {
 	if (!proxyUrl) {
-		logger.info("Bot: The bot will be launched without using a proxy");
+		logger.info(lexicon.log.proxyDisabled);
 		return false;
 	}
 
@@ -18,12 +20,15 @@ export async function validateSocksProxy(proxyUrl: string | undefined): Promise<
 			timeout: 5000,
 		});
 
-		logger.info(`External IP via ${process.env.PROXY_URL ? "proxy" : "direct"}: ${response.data.ip}`);
+		const type = process.env.PROXY_URL ? "proxy" : "direct";
+
+		logger.info(lexicon.log.externalIp(type, response.data.ip));
 
 		return Boolean(response.data?.ip);
 	} catch (error) {
-		logger.error(`Failed to fetch external IP: ${error}`);
-		logger.info("Bot: The bot will be launched without using a proxy");
+		logger.error(lexicon.log.failedFetchExternalIp(error));
+		logger.info(lexicon.log.proxyDisabled);
+
 		return false;
 	}
 }

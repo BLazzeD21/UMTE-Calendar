@@ -81,7 +81,7 @@ export class TelegramBot {
 				logger.info(lexicon.log.messageSentSuccessfully);
 				return;
 			} catch (error) {
-				logger.error(`sendMessage attempt ${attempt} failed: ${error.cause ? error.cause : error}`);
+				logger.error(lexicon.log.sendMessageAttemptFailed(attempt, error));
 
 				await new Promise((r) => setTimeout(r, 2000));
 			}
