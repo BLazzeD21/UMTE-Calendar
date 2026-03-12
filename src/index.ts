@@ -6,7 +6,7 @@ import { CONFIG, logger } from "@/config";
 
 import { createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
-import { getFile } from "@/utils";
+import { getFile, validateSocksProxy } from "@/utils";
 
 import { lexicon } from "@/lexicon";
 
@@ -61,9 +61,12 @@ const main = async () => {
 	let bot: TelegramBot | null = null;
 
 	if (process.env.TELEGRAM_BOT_TOKEN && process.env.CHAT_ID) {
+		const proxyUrl = process.env.PROXY_URL;
 		const token = process.env.TELEGRAM_BOT_TOKEN;
 		const chatID = process.env.CHAT_ID;
 		const topicID = process.env.TOPIC_ID || undefined;
+
+		const validProxy = await validateSocksProxy(proxyUrl);
 
 		bot = new TelegramBot({
 			token: token,
@@ -71,6 +74,7 @@ const main = async () => {
 			replyMessage: lexicon.replyMessage,
 			chatId: chatID,
 			topicId: topicID,
+			proxyUrl: validProxy ? proxyUrl : undefined,
 		});
 
 		bot.start();

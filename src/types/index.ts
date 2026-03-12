@@ -73,3 +73,12 @@ export interface CalendarDiff {
 	added: CalendarEvent[];
 	changed: ChangedEvent[];
 }
+
+export interface TelegramBotOptions {
+	token: string;
+	startMessage: string;
+	replyMessage: string;
+	chatId: string;
+	topicId?: string;
+	proxyUrl?: string | undefined;
+}

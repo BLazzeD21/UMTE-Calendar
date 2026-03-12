@@ -1,42 +1,51 @@
 import { Bot, Context } from "grammy";
 import { ParseMode } from "grammy/types";
+import { SocksProxyAgent } from "socks-proxy-agent";
 
 import { logger } from "@/config";
+
+import { TelegramBotOptions } from "@/types";
 
 import { lexicon } from "@/lexicon";
 
 const PARSE_MODE = "HTML";
 
-interface TelegramBotOptions {
-	token: string;
-	startMessage: string;
-	replyMessage: string;
-	chatId: string;
-	topicId?: string;
-}
-
 export class TelegramBot {
 	private bot: Bot<Context>;
+	private socksProxyAgent: SocksProxyAgent;
 	private chatId: string;
 	private topicId?: number;
 	private startMessage: string;
 	private replyMessage: string;
 
 	constructor(options: TelegramBotOptions) {
-		this.bot = new Bot(options.token);
 		this.chatId = options.chatId;
 		this.topicId = options.topicId ? Number(options.topicId) : undefined;
 		this.startMessage = options.startMessage;
 		this.replyMessage = options.replyMessage;
 
+		const proxyUrl = options.proxyUrl;
+
+		this.socksProxyAgent = proxyUrl ? new SocksProxyAgent(proxyUrl) : undefined;
+
+		this.bot = new Bot<Context>(options.token, {
+			client: {
+				baseFetchConfig: {
+					agent: this.socksProxyAgent || undefined,
+					compress: true,
+				},
+			},
+		});
+
 		this.registerHandlers();
 	}
 
 	public start() {
-		logger.info(lexicon.log.botStarting);
-		this.bot.start().catch((err) => {
-			logger.error(`${lexicon.log.botErrorStarting} - ${err}`);
+		this.bot.start().catch((error) => {
+			logger.error(`${lexicon.log.botErrorStarting} - ${error}`);
 		});
+
+		logger.info(lexicon.log.botStarting);
 	}
 
 	public updateChat(chatId: string, topicId?: string | number) {
@@ -72,7 +81,8 @@ export class TelegramBot {
 				logger.info(lexicon.log.messageSentSuccessfully);
 				return;
 			} catch (error) {
-				logger.error(`sendMessage attempt ${attempt} failed`, error);
+				logger.error(`sendMessage attempt ${attempt} failed: ${error.cause ? error.cause : error}`);
+
 				await new Promise((r) => setTimeout(r, 2000));
 			}
 		}
