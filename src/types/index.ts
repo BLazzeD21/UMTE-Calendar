@@ -36,7 +36,6 @@ export interface GroupConfig {
 	password: string;
 	chatId?: string;
 	topicId?: string;
-	calendarUrl?: string;
 }
 
 export interface GroupPaths {

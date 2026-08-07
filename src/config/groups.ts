@@ -63,7 +63,6 @@ const parseGroups = (raw: unknown): GroupConfig[] => {
 			password: String(entry.password),
 			chatId: entry.chatId ? String(entry.chatId) : undefined,
 			topicId: entry.topicId ? String(entry.topicId) : undefined,
-			calendarUrl: entry.calendarUrl ? String(entry.calendarUrl) : undefined,
 		};
 
 		if (!group.chatId) {

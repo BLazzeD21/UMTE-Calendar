@@ -1,6 +1,6 @@
 import { promises } from "fs";
 
-import { CONFIG } from "@/config";
+import { CONFIG, getCalendarUrl } from "@/config";
 
 import { backup } from "@/scripts";
 
@@ -45,9 +45,11 @@ export const updateCalendar = async (
 		const diffJSON = compareCalendarsJSON(existingFile, updatedContent);
 		const changes = formatDiffForUser(JSON.parse(diffJSON));
 
-		const message = lexicon.message(changes, group.calendarUrl);
+		const calendarUrl = getCalendarUrl(group.id);
+
+		const message = lexicon.message(changes, calendarUrl);
 		const messageText =
-			message.length <= CONFIG.messageMaxLength ? message : lexicon.message(lexicon.lengthExceeded, group.calendarUrl);
+			message.length <= CONFIG.messageMaxLength ? message : lexicon.message(lexicon.lengthExceeded, calendarUrl);
 
 		await bot.sendMessage({ chatId: group.chatId, topicId: group.topicId }, messageText);
 	}

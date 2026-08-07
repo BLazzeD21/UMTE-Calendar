@@ -67,8 +67,7 @@ cp groups.template.json groups.json
 		"username": "1623320",
 		"password": "password",
 		"chatId": "-3910194759",
-		"topicId": "12321",
-		"calendarUrl": "https://yourdomain.com/calendar.ics"
+		"topicId": "12321"
 	},
 	{
 		"id": "ivt-22",
@@ -80,15 +79,17 @@ cp groups.template.json groups.json
 ]
 ```
 
-| Field         | Required | Description                                                                                          |
-| ------------- | -------- | ---------------------------------------------------------------------------------------------------- |
-| `id`          | yes      | Latin letters, digits, `-` and `_` only. Names the generated `calendar/<id>.ics` and `backup/<id>/`. |
-| `name`        | no       | Human-readable label used in logs. Defaults to `id`.                                                 |
-| `username`    | yes      | umeos.ru login for this group.                                                                       |
-| `password`    | yes      | umeos.ru password for this group.                                                                    |
-| `chatId`      | no       | Telegram chat to notify. Without it the group is generated but never announced.                      |
-| `topicId`     | no       | Telegram topic inside `chatId`.                                                                      |
-| `calendarUrl` | no       | Public `.ics` URL, added as a link to the notification message.                                      |
+| Field      | Required | Description                                                                                                                               |
+| ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`       | yes      | Latin letters, digits, `-` and `_` only. Names the generated `calendar/<id>.ics`, the `backup/<id>/` directory and the subscription link. |
+| `name`     | no       | Human-readable label used in logs. Defaults to `id`.                                                                                      |
+| `username` | yes      | umeos.ru login for this group.                                                                                                            |
+| `password` | yes      | umeos.ru password for this group.                                                                                                         |
+| `chatId`   | no       | Telegram chat to notify. Without it the group is generated but never announced.                                                           |
+| `topicId`  | no       | Telegram topic inside `chatId`.                                                                                                           |
+
+The public `.ics` link in notifications is not configured per group — it is built as `<CALENDAR_BASE_URL>/<id>.ics`
+from the domain in `.env`, so adding a group needs no URL bookkeeping.
 
 > [!IMPORTANT]
 > `groups.json` holds credentials and is gitignored — never commit it.
@@ -270,11 +271,17 @@ If you want to secure Nginx with Let's Encrypt, follow these [instructions](/Let
 
 The Telegram bot is disabled by default. To enable notifications, create a bot using [@BotFather](https://telegram.me/BotFather). You will receive a token to access the HTTP Telegram API. You will also need the **CHAT_ID** where the bot's messages will be sent, or the **CHAT_ID** and **TOPIC_ID** if you have topics enabled in the group.
 
-The token is shared by every group and lives in `.env`:
+The token is shared by every group and lives in `.env`, together with the domain your `.ics` files are served from:
 
 ```bash
 TELEGRAM_BOT_TOKEN=Token from BotFather
+CALENDAR_BASE_URL=https://yourdomain.com
 ```
+
+Every notification links to `<CALENDAR_BASE_URL>/<group id>.ics` — for the group `ivt-22` that is
+`https://yourdomain.com/ivt-22.ics`, which is exactly the file you symlinked for nginx above. A bare domain works too
+(`yourdomain.com` is read as `https://yourdomain.com`), and a trailing slash is ignored. Leave the variable out and
+messages are sent without the calendar link.
 
 The destination is per group and lives in `groups.json`, so each group can be announced in its own chat:
 

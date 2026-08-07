@@ -23,6 +23,18 @@ export const CONFIG = {
 	groupIdPattern: /^[a-zA-Z0-9_-]+$/,
 };
 
+export const getCalendarUrl = (groupId: string): string | undefined => {
+	const baseUrl = process.env.CALENDAR_BASE_URL?.trim();
+
+	if (!baseUrl) {
+		return undefined;
+	}
+
+	const origin = /^https?:\/\//i.test(baseUrl) ? baseUrl : `https://${baseUrl}`;
+
+	return `${origin.replace(/\/+$/, "")}/${groupId}.ics`;
+};
+
 export const getGroupPaths = (groupId: string): GroupPaths => {
 	const backupDir = path.join(CONFIG.dirs.backup, groupId);
 

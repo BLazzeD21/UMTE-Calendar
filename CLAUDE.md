@@ -95,10 +95,15 @@ src/
 ## Environment
 
 `groups.json` (gitignored, template in `groups.template.json`) is the primary config: an array of groups, each with
-`id` (required, `^[a-zA-Z0-9_-]+$` — it becomes the `.ics` file name and backup directory), `username`, `password`
-(both required), and optional `name`, `chatId`, `topicId`, `calendarUrl`.
+`id` (required, `^[a-zA-Z0-9_-]+$`), `username`, `password` (both required), and optional `name`, `chatId`, `topicId`.
 
-`.env` (gitignored, template in `.env.template`): `TELEGRAM_BOT_TOKEN` and `PROXY_URL`
+`id` is the single source of truth for everything named after a group — `calendar/<id>.ics`, `backup/<id>/`, and the
+public subscription link. The link is **derived, never configured per group**: `getCalendarUrl` builds
+`<CALENDAR_BASE_URL>/<id>.ics` from `.env`, tolerating a missing scheme and a trailing slash, and returns `undefined`
+when the variable is unset (`lexicon.message` then omits the link). Don't reintroduce a per-group URL field — it would
+let the link drift away from the file actually being written.
+
+`.env` (gitignored, template in `.env.template`): `TELEGRAM_BOT_TOKEN`, `CALENDAR_BASE_URL` and `PROXY_URL`
 (`socks5://user:pass@host:port`) are optional and shared by all groups. `UMTE_USERNAME`, `UMTE_PASSWORD`, `CHAT_ID`,
 `TOPIC_ID` are the legacy single-group fallback, read only when `groups.json` does not exist.
 
