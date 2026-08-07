@@ -62,6 +62,11 @@ export const lexicon = {
 			return `Group "${name}" has no chatId, notifications for it are disabled`;
 		},
 		noGroupsConfigured: "No groups configured. Exiting...",
+		calendarsHeader: "Calendars will be available at:",
+		calendarLocation: (name: string, location: string) => {
+			return `${name} -> ${location}`;
+		},
+		calendarBaseUrlMissing: "CALENDAR_BASE_URL is not set, notifications will be sent without a calendar link",
 		groupsLoaded: (count: number) => {
 			return `Groups configured: ${count}`;
 		},

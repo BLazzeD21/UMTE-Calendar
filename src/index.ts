@@ -2,7 +2,7 @@ import "dotenv/config";
 import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
 
-import { CONFIG, createGroupLogger, getGroupPaths, loadGroups, logger } from "@/config";
+import { CONFIG, createGroupLogger, getCalendarUrl, getGroupPaths, loadGroups, logger } from "@/config";
 
 import { cleanupBackups, createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
@@ -62,6 +62,24 @@ const runGroups = async (groups: GroupConfig[], bot: TelegramBot | null, createI
 	logger.info(lexicon.log.cycleFinished);
 };
 
+const logCalendarLocations = (groups: GroupConfig[]) => {
+	const locations = groups.map((group) => ({
+		name: group.name,
+		url: getCalendarUrl(group.id),
+		path: getGroupPaths(group.id).calendar,
+	}));
+
+	logger.info(lexicon.log.calendarsHeader);
+
+	for (const location of locations) {
+		logger.info(lexicon.log.calendarLocation(location.name, location.url || location.path));
+	}
+
+	if (locations.some((location) => !location.url)) {
+		logger.warn(lexicon.log.calendarBaseUrlMissing);
+	}
+};
+
 const cleanupGroups = async (groups: GroupConfig[]) => {
 	for (const group of groups) {
 		await cleanupBackups(getGroupPaths(group.id), createGroupLogger(group.name));
@@ -98,6 +116,8 @@ const main = async () => {
 		logger.error(lexicon.log.noGroupsConfigured);
 		return;
 	}
+
+	logCalendarLocations(groups);
 
 	const bot = await createBot(groups);
 
