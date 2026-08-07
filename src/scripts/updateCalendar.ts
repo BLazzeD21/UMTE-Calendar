@@ -1,12 +1,12 @@
 import { promises } from "fs";
 
-import { CONFIG, logger } from "@/config";
+import { CONFIG } from "@/config";
 
 import { backup } from "@/scripts";
 
 import { compareCalendarsJSON, formatDiffForUser, getFile, hasICSChanges } from "@/utils";
 
-import { ClassSchedule } from "@/types";
+import { ClassSchedule, GroupContext } from "@/types";
 
 import { lexicon } from "@/lexicon";
 
@@ -14,35 +14,41 @@ import { TelegramBot } from "@/bot";
 
 import { getUpdatedCalendar } from "./getUpdatedCalendar";
 
-export const updateCalendar = async (schedule: ClassSchedule, existingFile: string, bot: TelegramBot) => {
-	const updatedCalendar = await getUpdatedCalendar(existingFile, schedule);
+export const updateCalendar = async (
+	schedule: ClassSchedule,
+	existingFile: string,
+	{ group, paths, log }: GroupContext,
+	bot: TelegramBot | null,
+) => {
+	const updatedCalendar = await getUpdatedCalendar(existingFile, schedule, log);
 	if (!updatedCalendar) return;
 
-	const [hasChanges, existingCalendar] = await hasICSChanges(updatedCalendar.toString(), CONFIG.files.calendar);
+	const updatedContent = updatedCalendar.toString();
 
-	if (!hasChanges) {
-		const existingBackup = await getFile(CONFIG.files.backupActual.path);
+	if (!hasICSChanges(updatedContent, existingFile)) {
+		const existingBackup = await getFile(paths.backupActual.path);
+
 		if (!existingBackup) {
-			await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
+			await backup(updatedCalendar, paths, log);
 		}
-		logger.info(lexicon.log.updateSkipped);
+
+		log.info(lexicon.log.updateSkipped);
 		return;
 	}
 
-	if (hasChanges && bot != null) {
-		const diffJSON = compareCalendarsJSON(existingCalendar.toString(), updatedCalendar.toString());
+	await promises.writeFile(paths.calendar, updatedContent, "utf-8");
+	log.info(lexicon.log.successfullyUpdated);
 
+	await backup(updatedCalendar, paths, log);
+
+	if (bot && group.chatId) {
+		const diffJSON = compareCalendarsJSON(existingFile, updatedContent);
 		const changes = formatDiffForUser(JSON.parse(diffJSON));
 
+		const message = lexicon.message(changes, group.calendarUrl);
 		const messageText =
-			lexicon.message(changes).length <= 2000 ? lexicon.message(changes) : lexicon.message(lexicon.lengthExceeded);
+			message.length <= CONFIG.messageMaxLength ? message : lexicon.message(lexicon.lengthExceeded, group.calendarUrl);
 
-		bot.sendMessage(messageText);
+		await bot.sendMessage({ chatId: group.chatId, topicId: group.topicId }, messageText);
 	}
-
-	await promises.writeFile(CONFIG.files.calendar, updatedCalendar.toString(), "utf-8").then(async () => {
-		logger.info(lexicon.log.successfullyUpdated);
-
-		await backup(updatedCalendar, CONFIG.files.backupActual.path, CONFIG.files.backupActual.name, CONFIG.dirs.backup);
-	});
 };

@@ -21,12 +21,44 @@ export interface ScheduleEntry {
 	subject: SubjectDetails;
 }
 
-export type ClassSchedule = ScheduleEntry[] | [];
+export type ClassSchedule = ScheduleEntry[];
+
+export interface GroupLogger {
+	info: (message: string) => void;
+	warn: (message: string) => void;
+	error: (message: string) => void;
+}
+
+export interface GroupConfig {
+	id: string;
+	name: string;
+	username: string;
+	password: string;
+	chatId?: string;
+	topicId?: string;
+	calendarUrl?: string;
+}
+
+export interface GroupPaths {
+	calendar: string;
+	backupDir: string;
+	backupActual: {
+		name: string;
+		path: string;
+	};
+}
+
+export interface GroupContext {
+	group: GroupConfig;
+	paths: GroupPaths;
+	log: GroupLogger;
+}
 
 export interface ScheduleParserOptions {
 	username: string;
 	password: string;
 	headless?: boolean;
+	log?: GroupLogger;
 }
 
 export interface CalendarGenerationOptions {
@@ -74,11 +106,14 @@ export interface CalendarDiff {
 	changed: ChangedEvent[];
 }
 
+export interface MessageTarget {
+	chatId: string;
+	topicId?: string;
+}
+
 export interface TelegramBotOptions {
 	token: string;
 	startMessage: string;
 	replyMessage: string;
-	chatId: string;
-	topicId?: string;
-	proxyUrl?: string | undefined;
+	proxyUrl?: string;
 }

@@ -2,96 +2,112 @@ import "dotenv/config";
 import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
 
-import { CONFIG, logger } from "@/config";
+import { CONFIG, createGroupLogger, getGroupPaths, loadGroups, logger } from "@/config";
 
 import { createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
 import { getFile, validateSocksProxy } from "@/utils";
 
+import { GroupConfig, GroupContext } from "@/types";
+
 import { lexicon } from "@/lexicon";
 
 import { TelegramBot } from "@/bot";
 
-const runOnce = async (bot: TelegramBot) => {
+const runGroup = async (group: GroupConfig, bot: TelegramBot | null, createIfMissing: boolean) => {
+	const context: GroupContext = {
+		group: group,
+		paths: getGroupPaths(group.id),
+		log: createGroupLogger(group.name),
+	};
+
 	const schedule = await parseSchedule({
-		username: process.env.UMTE_USERNAME,
-		password: process.env.UMTE_PASSWORD,
+		username: group.username,
+		password: group.password,
+		log: context.log,
 	});
 
 	if (!schedule.length) {
-		logger.error(lexicon.log.noScheduleData);
+		context.log.error(lexicon.log.noScheduleData);
 		return;
 	}
 
-	const existingFile = await getFile(CONFIG.files.calendar);
+	const existingFile = await getFile(context.paths.calendar);
+
 	if (existingFile) {
-		await updateCalendar(schedule, existingFile, bot);
-	} else {
-		logger.warn(lexicon.log.noScheduleData);
-		await createCalendar(schedule);
+		await updateCalendar(schedule, existingFile, context, bot);
+		return;
 	}
+
+	if (!createIfMissing) {
+		context.log.warn(lexicon.log.existingCalendarNotFound);
+		return;
+	}
+
+	context.log.warn(lexicon.log.generatingNewCalendar);
+	await createCalendar(schedule, context);
 };
 
-const scheduledUpdate = async (bot: TelegramBot) => {
-	const schedule = await parseSchedule({
-		username: process.env.UMTE_USERNAME,
-		password: process.env.UMTE_PASSWORD,
+const runGroups = async (groups: GroupConfig[], bot: TelegramBot | null, createIfMissing: boolean) => {
+	logger.info(lexicon.log.cycleStarted(groups.length));
+
+	for (const group of groups) {
+		try {
+			await runGroup(group, bot, createIfMissing);
+		} catch (error) {
+			logger.error(lexicon.log.groupFailed(group.name, error));
+		}
+	}
+
+	logger.info(lexicon.log.cycleFinished);
+};
+
+const createBot = async (groups: GroupConfig[]): Promise<TelegramBot | null> => {
+	const token = process.env.TELEGRAM_BOT_TOKEN;
+
+	if (!token || !groups.some((group) => group.chatId)) {
+		logger.warn(lexicon.log.launchingWithoutBot);
+		return null;
+	}
+
+	const proxyUrl = process.env.PROXY_URL;
+	const validProxy = await validateSocksProxy(proxyUrl);
+
+	const bot = new TelegramBot({
+		token: token,
+		startMessage: lexicon.startMessage,
+		replyMessage: lexicon.replyMessage,
+		proxyUrl: validProxy ? proxyUrl : undefined,
 	});
 
-	if (!schedule.length) {
-		logger.error(lexicon.log.noScheduleData);
-		return;
-	}
+	bot.start();
 
-	const existingFile = await getFile(CONFIG.files.calendar);
-	if (!existingFile) {
-		logger.warn(lexicon.log.existingCalendarNotFound);
-		return;
-	}
-
-	await updateCalendar(schedule, existingFile, bot);
+	return bot;
 };
 
 const main = async () => {
-	if (!process.env.UMTE_USERNAME || !process.env.UMTE_PASSWORD) {
-		logger.error(lexicon.log.missingEnvVars);
+	const groups = loadGroups();
+
+	if (!groups.length) {
+		logger.error(lexicon.log.noGroupsConfigured);
 		return;
 	}
 
-	let bot: TelegramBot | null = null;
-
-	if (process.env.TELEGRAM_BOT_TOKEN && process.env.CHAT_ID) {
-		const proxyUrl = process.env.PROXY_URL;
-		const token = process.env.TELEGRAM_BOT_TOKEN;
-		const chatID = process.env.CHAT_ID;
-		const topicID = process.env.TOPIC_ID || undefined;
-
-		const validProxy = await validateSocksProxy(proxyUrl);
-
-		bot = new TelegramBot({
-			token: token,
-			startMessage: lexicon.startMessage,
-			replyMessage: lexicon.replyMessage,
-			chatId: chatID,
-			topicId: topicID,
-			proxyUrl: validProxy ? proxyUrl : undefined,
-		});
-
-		bot.start();
-	} else {
-		logger.warn(lexicon.log.launchingWithoutBot);
-	}
+	const bot = await createBot(groups);
 
 	await promises.mkdir(CONFIG.dirs.calendar, { recursive: true });
 	await promises.mkdir(CONFIG.dirs.backup, { recursive: true });
 
-	await runOnce(bot);
+	await runGroups(groups, bot, true);
 
 	setTimeout(() => {
-		scheduleJob("*/60 * * * *", () => scheduledUpdate(bot));
+		scheduleJob(CONFIG.schedulerRule, () => {
+			runGroups(groups, bot, false).catch((error) => logger.error(lexicon.log.fatalError(error)));
+		});
 	}, CONFIG.schedulerDelay);
 };
 
-(async () => {
-	await main();
-})();
+main().catch((error) => {
+	logger.error(lexicon.log.fatalError(error));
+	process.exit(1);
+});

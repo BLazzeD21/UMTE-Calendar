@@ -1,5 +1,7 @@
 import { createLogger, format, transports } from "winston";
 
+import { GroupLogger } from "@/types";
+
 const colors = {
 	reset: "\x1b[0m",
 	green: "\x1b[32m",
@@ -67,4 +69,10 @@ const logger = createLogger({
 	],
 });
 
-export { logger };
+const createGroupLogger = (group: string): GroupLogger => ({
+	info: (message: string) => logger.info(`[${group}] ${message}`),
+	warn: (message: string) => logger.warn(`[${group}] ${message}`),
+	error: (message: string) => logger.error(`[${group}] ${message}`),
+});
+
+export { logger, createGroupLogger };

@@ -2,9 +2,9 @@ import { Bot, Context } from "grammy";
 import { ParseMode } from "grammy/types";
 import { SocksProxyAgent } from "socks-proxy-agent";
 
-import { logger } from "@/config";
+import { CONFIG, logger } from "@/config";
 
-import { TelegramBotOptions } from "@/types";
+import { MessageTarget, TelegramBotOptions } from "@/types";
 
 import { lexicon } from "@/lexicon";
 
@@ -12,15 +12,11 @@ const PARSE_MODE = "HTML";
 
 export class TelegramBot {
 	private bot: Bot<Context>;
-	private socksProxyAgent: SocksProxyAgent;
-	private chatId: string;
-	private topicId?: number;
+	private socksProxyAgent?: SocksProxyAgent;
 	private startMessage: string;
 	private replyMessage: string;
 
 	constructor(options: TelegramBotOptions) {
-		this.chatId = options.chatId;
-		this.topicId = options.topicId ? Number(options.topicId) : undefined;
 		this.startMessage = options.startMessage;
 		this.replyMessage = options.replyMessage;
 
@@ -48,13 +44,6 @@ export class TelegramBot {
 		logger.info(lexicon.log.botStarting);
 	}
 
-	public updateChat(chatId: string, topicId?: string | number) {
-		this.chatId = chatId;
-		if (topicId !== undefined) {
-			this.topicId = Number(topicId);
-		}
-	}
-
 	private registerHandlers() {
 		this.bot.command("start", async (ctx) => {
 			await ctx.reply(this.startMessage, { parse_mode: PARSE_MODE });
@@ -65,26 +54,39 @@ export class TelegramBot {
 		});
 	}
 
-	public async sendMessage(message: string, parseMode: ParseMode = PARSE_MODE) {
+	public async sendMessage(
+		target: MessageTarget,
+		message: string,
+		parseMode: ParseMode = PARSE_MODE,
+	): Promise<boolean> {
 		const options: {
 			parse_mode: ParseMode;
 			message_thread_id?: number;
 		} = { parse_mode: parseMode };
 
-		if (this.topicId) {
-			options.message_thread_id = this.topicId;
+		const topicId = target.topicId ? Number(target.topicId) : undefined;
+
+		if (topicId) {
+			options.message_thread_id = topicId;
 		}
 
-		for (let attempt = 1; attempt <= 3; attempt++) {
+		for (let attempt = 1; attempt <= CONFIG.sendAttempts; attempt++) {
 			try {
-				await this.bot.api.sendMessage(this.chatId, message, options);
+				await this.bot.api.sendMessage(target.chatId, message, options);
 				logger.info(lexicon.log.messageSentSuccessfully);
-				return;
+
+				return true;
 			} catch (error) {
 				logger.error(lexicon.log.sendMessageAttemptFailed(attempt, error));
 
-				await new Promise((r) => setTimeout(r, 2000));
+				if (attempt < CONFIG.sendAttempts) {
+					await new Promise((resolve) => setTimeout(resolve, CONFIG.sendRetryDelay));
+				}
 			}
 		}
+
+		logger.error(lexicon.log.errorSendingMessage(CONFIG.sendAttempts));
+
+		return false;
 	}
 }

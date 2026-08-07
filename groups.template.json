@@ -1,0 +1,19 @@
+[
+	{
+		"id": "calendar",
+		"name": "ИСП-21",
+		"username": "1623320",
+		"password": "F9v7f12RtGXu",
+		"chatId": "-3910194759",
+		"topicId": "12321",
+		"calendarUrl": "https://umeos.example.tech/calendar.ics"
+	},
+	{
+		"id": "ivt-22",
+		"name": "ИВТ-22",
+		"username": "1623321",
+		"password": "R7t2Kd91Wqmz",
+		"chatId": "-3910194760",
+		"calendarUrl": "https://umeos.example.tech/ivt-22.ics"
+	}
+]

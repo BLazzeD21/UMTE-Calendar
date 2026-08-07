@@ -52,12 +52,65 @@ cd UMTE-Calendar/
 npm i && npx playwright install && npx playwright install-deps
 ```
 
-In the **UMTE-Calendar** directory you need to create a `.env` file containing the credentials for umeos.ru
+In the **UMTE-Calendar** directory you need to create a `groups.json` file describing every group you want to track.
+Each group is scraped with its own umeos.ru account. Use `groups.template.json` as a starting point:
 
 ```bash
-UMTE_USERNAME=username
-UMTE_PASSWORD=password
+cp groups.template.json groups.json
 ```
+
+```json
+[
+	{
+		"id": "calendar",
+		"name": "ИСП-21",
+		"username": "1623320",
+		"password": "password",
+		"chatId": "-3910194759",
+		"topicId": "12321",
+		"calendarUrl": "https://yourdomain.com/calendar.ics"
+	},
+	{
+		"id": "ivt-22",
+		"name": "ИВТ-22",
+		"username": "1623321",
+		"password": "password",
+		"chatId": "-3910194760"
+	}
+]
+```
+
+| Field         | Required | Description                                                                                          |
+| ------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| `id`          | yes      | Latin letters, digits, `-` and `_` only. Names the generated `calendar/<id>.ics` and `backup/<id>/`. |
+| `name`        | no       | Human-readable label used in logs. Defaults to `id`.                                                 |
+| `username`    | yes      | umeos.ru login for this group.                                                                       |
+| `password`    | yes      | umeos.ru password for this group.                                                                    |
+| `chatId`      | no       | Telegram chat to notify. Without it the group is generated but never announced.                      |
+| `topicId`     | no       | Telegram topic inside `chatId`.                                                                      |
+| `calendarUrl` | no       | Public `.ics` URL, added as a link to the notification message.                                      |
+
+> [!IMPORTANT]
+> `groups.json` holds credentials and is gitignored — never commit it.
+
+Groups are processed sequentially, one browser session per group, and a failing group does not stop the others.
+
+> [!NOTE]
+> If `groups.json` is absent, the service falls back to a single group built from `UMTE_USERNAME`, `UMTE_PASSWORD`,
+> `CHAT_ID` and `TOPIC_ID` in `.env`, using the id `calendar`. This keeps older single-group installations working, but
+> `groups.json` is the supported way to configure the service.
+
+#### Upgrading from a single-group installation
+
+Keep `"id": "calendar"` for your existing group — the generated file stays `calendar/calendar.ics`, so the nginx
+symlink and the subscription URL keep working. Backups now live in a per-group directory, so move the old one once:
+
+```bash
+mkdir -p backup/calendar && mv backup/ActualCalendar.ics backup/calendar/ActualCalendar.ics
+```
+
+Skipping this is harmless — a fresh `ActualCalendar.ics` is created on the next run and the old flat backup files are
+simply left alone.
 
 ### 2. Start an app
 
@@ -119,7 +172,7 @@ Now let's run the script:
 npm run start
 ```
 
-After running the script, a `calendar.ics` file will appear in the `/UMTE-Calendar/calendar` directory, which will contain a calendar that can be used for various purposes.
+After running the script, one `<id>.ics` file per configured group will appear in the `/UMTE-Calendar/calendar` directory — for the example above, `calendar.ics` and `ivt-22.ics`. Each one contains a calendar that can be used for various purposes.
 
 ### 3. Configuring `nginx`
 
@@ -129,10 +182,16 @@ First, install nginx:
 sudo apt install -y nginx
 ```
 
-Create a symbolic link to the `calendar.ics` file in a directory accessible to nginx. Run the following command:
+Create a symbolic link to the `.ics` file in a directory accessible to nginx. Run the following command:
 
 ```bash
 sudo ln -s /home/UMTE-Calendar/calendar/calendar.ics /var/www/html/calendar.ics
+```
+
+Repeat this for every group, using its `id` as the file name:
+
+```bash
+sudo ln -s /home/UMTE-Calendar/calendar/ivt-22.ics /var/www/html/ivt-22.ics
 ```
 
 Open the nginx configuration file for editing:
@@ -198,20 +257,32 @@ If you want to secure Nginx with Let's Encrypt, follow these [instructions](/Let
 
 The Telegram bot is disabled by default. To enable notifications, create a bot using [@BotFather](https://telegram.me/BotFather). You will receive a token to access the HTTP Telegram API. You will also need the **CHAT_ID** where the bot's messages will be sent, or the **CHAT_ID** and **TOPIC_ID** if you have topics enabled in the group.
 
-Configuration data you must add to `.env`.
+The token is shared by every group and lives in `.env`:
 
 ```bash
 TELEGRAM_BOT_TOKEN=Token from BotFather
-CHAT_ID=Telegram chat ID
-TOPIC_ID=Telegram chat topic ID
 ```
 
-If you don't have any topics in your chat, don't add **TOPIC_ID**.
+The destination is per group and lives in `groups.json`, so each group can be announced in its own chat:
+
+```json
+{
+	"id": "ivt-22",
+	"name": "ИВТ-22",
+	"username": "1623321",
+	"password": "password",
+	"chatId": "Telegram chat ID",
+	"topicId": "Telegram chat topic ID"
+}
+```
+
+If you don't have any topics in your chat, don't add **topicId**. A group without **chatId** still gets its `.ics`
+file generated, it is just never announced.
 
 > [!IMPORTANT]
 > In order for the bot to be able to send messages to the specified chat ID, it must be added to this chat.
 
-After filling in `.env` and adding the **bot** to the chat, the bot will work correctly and send messages _every time the schedule changes_.
+After filling in `.env`, `groups.json` and adding the **bot** to the chats, the bot will work correctly and send messages _every time the schedule changes_.
 
 ### 6. Using a Socks proxy for a Telegram bot
 

@@ -1,19 +1,24 @@
-import { Browser, chromium, Page } from "playwright";
+import { Browser, BrowserContext, chromium, Page } from "playwright";
 
 import { logger } from "@/config";
 
 import { ClassSchedule, DateDetails, ScheduleParserOptions, SubjectDetails } from "@/types";
 
+import { lexicon } from "@/lexicon";
+
 export const parseSchedule = async ({
 	username,
 	password,
 	headless = true,
+	log = logger,
 }: ScheduleParserOptions): Promise<ClassSchedule> => {
 	let browser: Browser;
+	let context: BrowserContext;
 
 	try {
 		browser = await chromium.launch({ headless: headless });
-		const page: Page = await browser.newPage();
+		context = await browser.newContext();
+		const page: Page = await context.newPage();
 
 		await page.goto("https://umeos.ru/login/index.php");
 
@@ -89,9 +94,13 @@ export const parseSchedule = async ({
 		});
 		return schedule;
 	} catch (error) {
-		logger.error(`An error occurred: ${error}`);
+		log.error(lexicon.log.parseFailed(error));
 		return [];
 	} finally {
+		if (context) {
+			await context.close();
+		}
+
 		if (browser) {
 			await browser.close();
 		}

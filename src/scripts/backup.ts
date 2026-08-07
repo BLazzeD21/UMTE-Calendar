@@ -2,23 +2,21 @@ import { existsSync, promises } from "fs";
 import { ICalCalendar } from "ical-generator";
 import path from "path";
 
-import { logger } from "@/config";
+import { GroupLogger, GroupPaths } from "@/types";
 
 import { lexicon } from "@/lexicon";
 
-export const backup = async (
-	calendar: ICalCalendar,
-	ACTUAL_CALENDAR_PATH: string,
-	ACTUAL_CALENDAR_NAME: string,
-	BACKUP_DIR: string,
-): Promise<void> => {
+export const backup = async (calendar: ICalCalendar, paths: GroupPaths, log: GroupLogger): Promise<void> => {
 	try {
 		const calendarContent = calendar.toString();
-		const isExistActual = existsSync(ACTUAL_CALENDAR_PATH);
+
+		await promises.mkdir(paths.backupDir, { recursive: true });
+
+		const isExistActual = existsSync(paths.backupActual.path);
 
 		if (!isExistActual) {
-			await promises.writeFile(ACTUAL_CALENDAR_PATH, calendarContent, "utf-8");
-			logger.info(lexicon.log.currentCalendarSaved(ACTUAL_CALENDAR_NAME));
+			await promises.writeFile(paths.backupActual.path, calendarContent, "utf-8");
+			log.info(lexicon.log.currentCalendarSaved(paths.backupActual.name));
 			return;
 		}
 
@@ -27,17 +25,17 @@ export const backup = async (
 		const minutes = String(now.getMinutes()).padStart(2, "0");
 
 		const dateString = `${now.toDateString()} ${hours}-${minutes}`;
-		const backupFileName = `Сalendar ${dateString}.ics`;
+		const backupFileName = `Calendar ${dateString}.ics`;
 
-		const backupFilePath = path.join(BACKUP_DIR, backupFileName);
+		const backupFilePath = path.join(paths.backupDir, backupFileName);
 
-		await promises.rename(ACTUAL_CALENDAR_PATH, backupFilePath);
-		logger.info(lexicon.log.previousCalendarSaved(backupFileName));
+		await promises.rename(paths.backupActual.path, backupFilePath);
+		log.info(lexicon.log.previousCalendarSaved(backupFileName));
 
-		await promises.writeFile(ACTUAL_CALENDAR_PATH, calendarContent, "utf-8");
-		logger.info(lexicon.log.currentCalendarSaved(ACTUAL_CALENDAR_NAME));
+		await promises.writeFile(paths.backupActual.path, calendarContent, "utf-8");
+		log.info(lexicon.log.currentCalendarSaved(paths.backupActual.name));
 	} catch (error) {
-		logger.error(`${lexicon.log.backupFailed}: ${error.message}`);
+		log.error(`${lexicon.log.backupFailed}: ${error}`);
 		throw error;
 	}
 };
