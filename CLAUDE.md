@@ -54,6 +54,16 @@ ignores volatile ics fields —
 must not be treated as real changes. Every write is followed by `backup`, which rotates the group's previous
 `backup/<groupId>/ActualCalendar.ics` into `backup/<groupId>/Calendar <date>.ics`.
 
+`cleanupBackups` deletes rotated `.ics` files older than `CONFIG.backupRetentionDays`. It runs on its own
+`node-schedule` job (`CONFIG.cleanupRule`, monthly) rather than inside the hourly pipeline — it is housekeeping, not
+part of producing a calendar, and must not cost a `readdir` + `stat` sweep every hour. There is no run at startup, so
+the first sweep on a fresh deploy happens on the 1st.
+
+Two invariants: `ActualCalendar.ics` is the live copy and is never a candidate, and **the newest rotated backup always
+survives regardless of age** — a group whose schedule went quiet for a year must not end up with zero history. Files
+are selected by **mtime, not by the date in the file name**: names are not a reliable clock and legacy backups were
+written with a Cyrillic `С`. Cleanup failures are logged and swallowed; a missing directory is ignored silently.
+
 Event identity is the UID built in `prepareEventData`: `${classNumber}-${subject.name}-${YYYY}${M}${D}@umte1`. The
 added/removed/changed diff in `compareCalendarsJSON` keys entirely off it — changing the UID format invalidates all
 existing calendars and would surface as a mass remove+add notification.

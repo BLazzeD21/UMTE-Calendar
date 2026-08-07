@@ -106,6 +106,14 @@ export const lexicon = {
 
 		backupFailed: "Backup failed",
 
+		backupsRemoved: (count: number, days: number) => {
+			return `Removed ${count} backup(s) older than ${days} days`;
+		},
+
+		backupCleanupFailed: (error: unknown) => {
+			return `Backup cleanup failed: ${error}`;
+		},
+
 		newCalendarEvents: (count: number) => {
 			return `New calendar events: ${count}`;
 		},

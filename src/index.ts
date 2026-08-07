@@ -4,7 +4,7 @@ import { scheduleJob } from "node-schedule";
 
 import { CONFIG, createGroupLogger, getGroupPaths, loadGroups, logger } from "@/config";
 
-import { createCalendar, parseSchedule, updateCalendar } from "@/scripts";
+import { cleanupBackups, createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
 import { getFile, validateSocksProxy } from "@/utils";
 
@@ -62,6 +62,12 @@ const runGroups = async (groups: GroupConfig[], bot: TelegramBot | null, createI
 	logger.info(lexicon.log.cycleFinished);
 };
 
+const cleanupGroups = async (groups: GroupConfig[]) => {
+	for (const group of groups) {
+		await cleanupBackups(getGroupPaths(group.id), createGroupLogger(group.name));
+	}
+};
+
 const createBot = async (groups: GroupConfig[]): Promise<TelegramBot | null> => {
 	const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -105,6 +111,10 @@ const main = async () => {
 			runGroups(groups, bot, false).catch((error) => logger.error(lexicon.log.fatalError(error)));
 		});
 	}, CONFIG.schedulerDelay);
+
+	scheduleJob(CONFIG.cleanupRule, () => {
+		cleanupGroups(groups).catch((error) => logger.error(lexicon.log.fatalError(error)));
+	});
 };
 
 main().catch((error) => {

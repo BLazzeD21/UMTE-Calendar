@@ -112,6 +112,19 @@ mkdir -p backup/calendar && mv backup/ActualCalendar.ics backup/calendar/ActualC
 Skipping this is harmless — a fresh `ActualCalendar.ics` is created on the next run and the old flat backup files are
 simply left alone.
 
+Once moved into `backup/calendar/`, the old backups fall under the retention policy below and are swept automatically.
+Anything you leave directly in `backup/` is never touched and can be deleted by hand.
+
+#### Backup retention
+
+Each group keeps its rotated backups in `backup/<id>/`. Once a month the service sweeps them and deletes everything
+older than **30 days**, with two exceptions that are always kept: `ActualCalendar.ics` (the live copy) and the most
+recent rotated backup, so a group never ends up with no history at all.
+
+Both settings live in `src/config/config.ts` — `backupRetentionDays` for the window and `cleanupRule` for the schedule
+(`0 3 1 * *`, 03:00 on the 1st of every month). The sweep does not run at startup, so on a fresh install the first one
+happens on the 1st.
+
 ### 2. Start an app
 
 Using pm2 to run the script. PM2 is a daemon process manager that will help you manage and keep your application online.

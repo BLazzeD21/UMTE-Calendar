@@ -15,6 +15,8 @@ export const CONFIG = {
 	},
 	schedulerDelay: 60 * 60 * 1000, // 1 hour
 	schedulerRule: "0 * * * *",
+	cleanupRule: "0 3 1 * *", // 03:00 on the 1st of every month
+	backupRetentionDays: 30,
 	messageMaxLength: 2000,
 	sendAttempts: 3,
 	sendRetryDelay: 2000,
