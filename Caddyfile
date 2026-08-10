@@ -1,0 +1,19 @@
+{$DOMAIN} {
+	encode gzip
+
+	@ics path *.ics
+	header @ics {
+		Content-Type "text/calendar; charset=utf-8"
+		Cache-Control "no-cache"
+	}
+
+	handle_path /backup/* {
+		root * /srv/backup
+		file_server browse
+	}
+
+	handle {
+		root * /srv/calendar
+		file_server browse
+	}
+}

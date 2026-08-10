@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    image: umte-calendar
+    container_name: umte-calendar
+    restart: unless-stopped
+    init: true
+    shm_size: 1gb
+    env_file: .env
+    environment:
+      TZ: ${TZ:-Europe/Moscow}
+    volumes:
+      - ./groups.json:/app/groups.json:ro
+      - ./calendar:/app/calendar
+      - ./backup:/app/backup
+      - ./logs:/app/logs
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: umte-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+      TZ: ${TZ:-Europe/Moscow}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./calendar:/srv/calendar:ro
+      - ./backup:/srv/backup:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

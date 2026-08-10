@@ -2,7 +2,100 @@
 
 # 💻 Transferring the UMTE schedule to an `ics` calendar
 
-## Script installation instructions
+## 🐳 Deployment with Docker (recommended)
+
+Everything the service needs — Node, Playwright's browsers with their system libraries, the web server and the TLS
+certificate — is described in `docker-compose.yml`. On a clean VPS the deployment is three commands, and there is
+nothing to configure per group afterwards.
+
+You need a server with [Docker](https://docs.docker.com/engine/install/ubuntu/) and a domain whose `A` record points
+at it.
+
+### 1. Clone and configure
+
+```bash
+cd /home
+git clone https://github.com/BLazzeD21/UMTE-Calendar.git
+cd UMTE-Calendar
+cp .env.template .env
+cp groups.template.json groups.json
+```
+
+Fill in `groups.json` (see [the table below](#2-installing-dependencies)) and `.env`:
+
+| Variable                          | Description                                                                   |
+| --------------------------------- | ----------------------------------------------------------------------------- |
+| `DOMAIN`                          | The host Caddy issues the certificate for. Must resolve to this server.       |
+| `CALENDAR_BASE_URL`               | Base of the links sent to Telegram. Normally `https://<DOMAIN>`.              |
+| `TZ`                              | Timezone of the container, `Europe/Moscow` by default.                        |
+| `TELEGRAM_BOT_TOKEN`, `PROXY_URL` | Optional, see [section 6](#6-schedule-change-notifications-via-telegram-bot). |
+
+> [!IMPORTANT]
+> `groups.json` and `.env` must exist as **files** before the first start. They are bind-mounted, and Docker silently
+> creates a _directory_ in place of a missing file, after which the service starts with no groups at all.
+
+> [!WARNING]
+> Do not change `TZ` on a running installation. Events are built in the container's local time while the calendar
+> declares `Europe/Moscow`, so a different timezone shifts every event and the next cycle reports the whole schedule
+> as changed.
+
+### 2. Start
+
+```bash
+docker compose up -d --build
+```
+
+The first build pulls the Playwright image and takes a few minutes — it is about 2 GB, so make sure the server has
+the disk space. Ports 80 and 443 must be free: if nginx is already running from an earlier installation, stop it with
+`sudo systemctl disable --now nginx`.
+
+That is the whole setup. Caddy obtains a Let's Encrypt certificate for `DOMAIN` on the first request and renews it on
+its own — no certbot, no cron job, no renew hook.
+
+### 3. What is served
+
+| URL                             | Contents                                                            |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `https://<DOMAIN>/<id>.ics`     | Subscription link for a group — the same one sent in notifications. |
+| `https://<DOMAIN>/`             | Listing of every generated calendar.                                |
+| `https://<DOMAIN>/backup/`      | Listing of the per-group backup directories.                        |
+| `https://<DOMAIN>/backup/<id>/` | Rotated backups of one group.                                       |
+
+The `calendar/` and `backup/` directories are served directly, so there are no symbolic links and no web server edits
+when the set of groups changes: add a group to `groups.json`, restart, and `<id>.ics` is available at once.
+
+> [!NOTE]
+> Backups are served without authentication — anyone who knows the domain can browse the schedule history of every
+> group. Nothing but schedule data is exposed there, but keep it in mind before adding a group.
+
+Check that it works:
+
+```bash
+curl -o - -I https://yourdomain.com/calendar.ics
+```
+
+### 4. Managing the deployment
+
+| Action                  | Command                                    |
+| ----------------------- | ------------------------------------------ |
+| Follow the logs         | `docker compose logs -f -t app`            |
+| Restart the service     | `docker compose restart app`               |
+| Stop everything         | `docker compose down`                      |
+| Update to a new version | `git pull && docker compose up -d --build` |
+| Shell in the container  | `docker compose exec app bash`             |
+
+The same commands are wired as `npm run docker:up`, `docker:down`, `docker:logs` and `docker:update`.
+
+Logs, calendars and backups live in the repository directory on the host (`logs/`, `calendar/`, `backup/`) and survive
+rebuilds. Certificates live in the `caddy_data` volume — don't delete it when rebuilding, Let's Encrypt rate-limits
+re-issuing.
+
+Everything below describes the manual installation on a bare VPS and is not needed when running under Docker —
+`Let's-Encrypt.md` included.
+
+---
+
+## Manual installation (without Docker)
 
 ### 1. Cloning a repository
 

@@ -110,3 +110,22 @@ let the link drift away from the file actually being written.
 Never commit real credentials — the values in `.env.template` and `groups.template.json` are dummies.
 
 `calendar/`, `backup/`, `logs/`, and `build/` are generated and gitignored; don't hand-edit them.
+
+## Deployment
+
+The supported deployment is `docker-compose.yml`: the `app` container (built from the Playwright base image, so the
+browser and its system libraries come with it) plus `caddy`, which terminates TLS and serves the files. PM2 is only
+used by the manual install documented in the second half of `README.md`.
+
+Caddy serves `calendar/` at the root and `backup/` under `/backup/` **as directories, read-only** — there are no
+symlinks and no per-group web server config, which is what keeps `id` the single source of truth for the public link.
+Adding a group must never require touching `Caddyfile`. Backups are intentionally public with directory browsing.
+
+`DOMAIN` in `.env` drives Caddy's certificate and must stay in sync with `CALENDAR_BASE_URL`; certificates live in the
+`caddy_data` volume and are renewed by Caddy itself.
+
+`TZ` (default `Europe/Moscow`) is load-bearing, not cosmetic: `prepareEventData` builds `new Date(...)` in the
+process's local time while `generatorCalendar` / `getUpdatedCalendar` declare `timezone: "Europe/Moscow"` in the ics.
+A container running in UTC shifts every event by three hours, which surfaces as the entire schedule being reported as
+changed. The Dockerfile pins the Playwright image tag to the `playwright` version in `package.json` — bump both
+together, or the browsers in the image won't match the client.
