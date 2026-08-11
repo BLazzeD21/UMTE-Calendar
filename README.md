@@ -9,7 +9,8 @@ certificate — is described in `docker-compose.yml`. On a clean VPS the deploym
 nothing to configure per group afterwards.
 
 You need a server with [Docker](https://docs.docker.com/engine/install/ubuntu/) and a domain whose `A` record points
-at it.
+at it. Nothing else has to be installed on the host — the image carries its own Node, so there is no `nodejs` package,
+no `npm i` and no `npx playwright install` on the server.
 
 ### 1. Clone and configure
 
@@ -130,13 +131,17 @@ Check the version of _node.js_ installed on the server:
 node -v
 ```
 
-If the version below _v18.20.6_ or _node.js_ is not installed, then you need to install:
+If the version is below _v22_ or _node.js_ is not installed, then you need to install:
 
 ```bash
 sudo apt install -y curl
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
 ```
+
+Node 18 reached end of life and no longer gets security updates; 22 is the current LTS and matches the `@types/node`
+version the project type-checks against. If an older release is already installed, the same two commands upgrade it in
+place — NodeSource switches the repository and `apt` replaces the package.
 
 Installing project dependencies and playwright:
 
