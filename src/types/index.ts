@@ -115,4 +115,5 @@ export interface TelegramBotOptions {
 	startMessage: string;
 	replyMessage: string;
 	proxyUrl?: string;
+	apiRoot?: string;
 }

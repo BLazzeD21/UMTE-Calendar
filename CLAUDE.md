@@ -117,6 +117,15 @@ The supported deployment is `docker-compose.yml`: the `app` container (built fro
 browser and its system libraries come with it) plus `caddy`, which terminates TLS and serves the files. PM2 is only
 used by the manual install documented in the second half of `README.md`.
 
+The VPS sits in Russia, where `api.telegram.org` is blocked, so the bot reaches it through `TELEGRAM_API_ROOT`
+(`getApiRoot` → grammy's `client.apiRoot`): a mirror of the Bot API — the Cloudflare Worker in `cloudflare/worker.js`
+— reached over plain HTTPS, with nothing on the wire for DPI to classify. It is passed to grammy only when set,
+because grammy spreads its defaults over the given options and an explicit `apiRoot: undefined` would erase the
+default endpoint rather than fall back to it. The bot token travels in the request path, so the mirror must be an
+endpoint the operator controls. `PROXY_URL` is an **alternative** to it, never a second layer. Only the bot uses
+either — Playwright must keep scraping umeos.ru from the server's own Russian IP, so never route the whole container
+out.
+
 Caddy serves `calendar/` at the root and `backup/` under `/backup/` **as directories, read-only** — there are no
 symlinks and no per-group web server config, which is what keeps `id` the single source of truth for the public link.
 Adding a group must never require touching `Caddyfile`. Backups are intentionally public with directory browsing.

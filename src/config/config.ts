@@ -35,6 +35,18 @@ export const getCalendarUrl = (groupId: string): string | undefined => {
 	return `${origin.replace(/\/+$/, "")}/${groupId}.ics`;
 };
 
+export const getApiRoot = (): string | undefined => {
+	const apiRoot = process.env.TELEGRAM_API_ROOT?.trim();
+
+	if (!apiRoot) {
+		return undefined;
+	}
+
+	const origin = /^https?:\/\//i.test(apiRoot) ? apiRoot : `https://${apiRoot}`;
+
+	return origin.replace(/\/+$/, "");
+};
+
 export const getGroupPaths = (groupId: string): GroupPaths => {
 	const backupDir = path.join(CONFIG.dirs.backup, groupId);
 

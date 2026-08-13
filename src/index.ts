@@ -2,7 +2,7 @@ import "dotenv/config";
 import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
 
-import { CONFIG, createGroupLogger, getCalendarUrl, getGroupPaths, loadGroups, logger } from "@/config";
+import { CONFIG, createGroupLogger, getApiRoot, getCalendarUrl, getGroupPaths, loadGroups, logger } from "@/config";
 
 import { cleanupBackups, createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
@@ -94,6 +94,12 @@ const createBot = async (groups: GroupConfig[]): Promise<TelegramBot | null> => 
 		return null;
 	}
 
+	const apiRoot = getApiRoot();
+
+	if (apiRoot) {
+		logger.info(lexicon.log.apiRootOverridden(apiRoot));
+	}
+
 	const proxyUrl = process.env.PROXY_URL;
 	const validProxy = await validateSocksProxy(proxyUrl);
 
@@ -102,6 +108,7 @@ const createBot = async (groups: GroupConfig[]): Promise<TelegramBot | null> => 
 		startMessage: lexicon.startMessage,
 		replyMessage: lexicon.replyMessage,
 		proxyUrl: validProxy ? proxyUrl : undefined,
+		apiRoot: apiRoot,
 	});
 
 	bot.start();

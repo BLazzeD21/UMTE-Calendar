@@ -40,6 +40,41 @@ Fill in `groups.json` (see [the table below](#2-installing-dependencies)) and `.
 > declares `Europe/Moscow`, so a different timezone shifts every event and the next cycle reports the whole schedule
 > as changed.
 
+### 1.1. Telegram from a server where it is blocked
+
+`api.telegram.org` is unreachable from inside Russia, so the bot needs a way out — while the umeos.ru scraping must
+keep going out on the server's own Russian IP, untouched.
+
+A [Cloudflare Worker](https://workers.cloudflare.com/) forwards the bot's requests to `api.telegram.org`; the server
+only ever makes ordinary HTTPS calls to an ordinary host, so there is no proxy protocol on the wire to detect.
+`cloudflare/worker.js` is the whole thing — paste it into a new Worker in the dashboard, or deploy it with
+`npx wrangler deploy` from `cloudflare/`. Then in `.env`:
+
+```bash
+TELEGRAM_API_ROOT=https://<worker-name>.<subdomain>.workers.dev
+```
+
+Optionally add a Worker secret `BOT_TOKEN` with the bot's token — the Worker then serves only your bot instead of
+relaying anyone's.
+
+> [!WARNING]
+> The bot token travels in the request path, so the mirror sees it. Only mirror through an endpoint you control, and
+> keep access logs off — a logged URL is a leaked token.
+
+If `*.workers.dev` itself turns out to be unreachable, bind the Worker to a subdomain of your own zone
+(`tg.example.tech`), or run the same thing as a Caddy site on any host outside the blocking:
+
+```caddy
+tg.example.tech {
+	reverse_proxy https://api.telegram.org {
+		header_up Host {upstream_hostport}
+	}
+}
+```
+
+`PROXY_URL` (see [section 6](#6-using-a-socks-proxy-for-a-telegram-bot)) is an alternative to the mirror, not a
+companion — leave it empty while `TELEGRAM_API_ROOT` is set.
+
 ### 2. Start
 
 ```bash

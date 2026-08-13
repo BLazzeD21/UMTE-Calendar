@@ -31,6 +31,9 @@ export const lexicon = {
 
 		/* bot */
 		launchingWithoutBot: "Bot: launching without a bot...",
+		apiRootOverridden: (apiRoot: string) => {
+			return `Bot: Using a custom Bot API endpoint: ${apiRoot}`;
+		},
 		botStarting: "Bot: Starting...",
 		botErrorStarting: "Bot: Error starting the bot",
 		sendMessageAttemptFailed: (attempt: number, error: unknown) => {

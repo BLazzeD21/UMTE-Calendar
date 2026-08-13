@@ -26,6 +26,7 @@ export class TelegramBot {
 
 		this.bot = new Bot<Context>(options.token, {
 			client: {
+				...(options.apiRoot ? { apiRoot: options.apiRoot } : {}),
 				baseFetchConfig: {
 					agent: this.socksProxyAgent || undefined,
 					compress: true,
