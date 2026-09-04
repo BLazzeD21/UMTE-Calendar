@@ -14,6 +14,15 @@ export const lexicon = {
 
 	lengthExceeded: "<i>Изменения очень большие. Посмотрите расписание!</i>\n",
 
+	webinarLink: (oldUrl?: string, newUrl?: string) => {
+		const link = (url: string, text: string) => `<a href="${url}">${text}</a>`;
+
+		if (!newUrl) return `ссылка на вебинар удалена: ${link(oldUrl, "старая")}`;
+		if (!oldUrl) return link(newUrl, "добавлена ссылка на вебинар");
+
+		return `ссылка на вебинар изменилась: ${link(oldUrl, "старая")} → ${link(newUrl, "новая")}`;
+	},
+
 	addedByDate: "✅ Появились новые пары:",
 	removedByDate: "❌ Пары отменены:",
 	changedByDate: "🔄 Изменено:",
@@ -190,6 +199,7 @@ export const lexicon = {
 		},
 
 		updateSkipped: "No changes detected, update skipped",
+		notificationSkipped: "The changes are not user-facing, notification skipped",
 		successfullyUpdated: "Calendar successfully updated!",
 	},
 

@@ -45,6 +45,11 @@ export const updateCalendar = async (
 		const diffJSON = compareCalendarsJSON(existingFile, updatedContent);
 		const changes = formatDiffForUser(JSON.parse(diffJSON));
 
+		if (!changes) {
+			log.info(lexicon.log.notificationSkipped);
+			return;
+		}
+
 		const calendarUrl = getCalendarUrl(group.id);
 
 		const message = lexicon.message(changes, calendarUrl);

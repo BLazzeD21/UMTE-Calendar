@@ -89,7 +89,7 @@ export interface CalendarEvent {
 	end: Date;
 	location: string;
 	description: string;
-	url?: URLDetails | string;
+	url?: string;
 }
 
 export interface ChangedEvent {

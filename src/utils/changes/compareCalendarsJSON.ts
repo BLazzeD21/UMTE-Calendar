@@ -34,8 +34,6 @@ export function compareCalendarsJSON(icsOld: string, icsNew: string): string {
 			> = {};
 
 			for (const key of Object.keys(oldEvent) as (keyof CalendarEvent)[]) {
-				if (key === "url") continue;
-
 				const oldValue = oldEvent[key];
 				const newValue = newEvent[key];
 

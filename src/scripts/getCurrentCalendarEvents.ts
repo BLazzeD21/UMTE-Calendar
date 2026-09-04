@@ -11,14 +11,10 @@ export const getCurrentCalendarEvents = (calendarData: string): CalendarEvent[] 
 		const event = parsedData[key];
 
 		if (event.type === "VEVENT") {
-			let url: URLDetails | string | undefined = undefined;
+			let url = "";
 
 			if (event.url) {
-				if (typeof event.url === "object") {
-					url = event.url;
-				} else {
-					url = event.url.toString();
-				}
+				url = typeof event.url === "object" ? (event.url as URLDetails).val : event.url.toString();
 			}
 
 			events.push({
@@ -29,7 +25,7 @@ export const getCurrentCalendarEvents = (calendarData: string): CalendarEvent[] 
 				end: event.end || undefined,
 				location: event.location || "",
 				description: event.description || "",
-				url: url || "",
+				url,
 			});
 		}
 	}

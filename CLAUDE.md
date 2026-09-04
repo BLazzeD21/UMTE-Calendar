@@ -50,9 +50,18 @@ scrape_ (`getOldEvents` / `getNewEvents`, split at today 00:00), compares agains
 `runGroup` with `hasICSChanges`, and only writes + notifies when something actually differs. The write and its backup
 happen **before** the Telegram notification, so users are never told about a change that failed to land. Comparison
 ignores volatile ics fields —
-`normalizeICS` strips `DTSTAMP`, `SEQUENCE`, `LAST-MODIFIED`, `CREATED`, and `URL;VALUE=URI` before diffing, so those
-must not be treated as real changes. Every write is followed by `backup`, which rotates the group's previous
-`backup/<groupId>/ActualCalendar.ics` into `backup/<groupId>/Calendar <date>.ics`.
+`normalizeICS` **unfolds RFC 5545 line folding first** and only then strips `DTSTAMP`, `SEQUENCE`, `LAST-MODIFIED` and
+`CREATED`, so those must not be treated as real changes. The unfolding step is load-bearing: values longer than 75
+octets are folded onto a continuation line, and stripping line by line would leave that tail behind, so a changed
+webinar link would read as a change in a property that is supposed to be ignored.
+
+`URL;VALUE=URI` is **not** volatile — a changed webinar link is a real change: it is compared, it triggers a write, and
+`formatDiffForUser` renders it as its own line (`lexicon.webinarLink`, a link rather than two unreadable URLs) instead
+of the generic `old → new`. `getCurrentCalendarEvents` therefore flattens node-ical's `{ params, val }` url object into
+a plain string — comparing the raw objects would report every url-bearing event as changed on every cycle. As a guard,
+the notification is skipped when `formatDiffForUser` comes back empty: a difference that no user-facing field explains
+must never produce a "schedule changed" message with nothing in it. Every write is followed by `backup`, which rotates
+the group's previous `backup/<groupId>/ActualCalendar.ics` into `backup/<groupId>/Calendar <date>.ics`.
 
 `cleanupBackups` deletes rotated `.ics` files older than `CONFIG.backupRetentionDays`. It runs on its own
 `node-schedule` job (`CONFIG.cleanupRule`, monthly) rather than inside the hourly pipeline — it is housekeeping, not

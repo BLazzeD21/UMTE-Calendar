@@ -1,11 +1,9 @@
+const VOLATILE_PROPERTIES = ["DTSTAMP", "SEQUENCE", "LAST-MODIFIED", "CREATED"];
+
 export const normalizeICS = (calendar: string): string => {
 	return calendar
-		.replace(/DTSTAMP:[^\r\n]*/g, "")
-		.replace(/URL;VALUE=URI:[^\r\n]*/g, "")
-		.replace(/SEQUENCE:[^\r\n]*/g, "")
-		.replace(/LAST-MODIFIED:[^\r\n]*/g, "")
-		.replace(/CREATED:[^\r\n]*/g, "")
 		.replace(/\r\n/g, "\n")
-		.replace(/\n+/g, "\n")
+		.replace(/\n[ \t]/g, "")
+		.replace(new RegExp(`^(?:${VOLATILE_PROPERTIES.join("|")}):[^\n]*\n?`, "gm"), "")
 		.trim();
 };

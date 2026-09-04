@@ -10,8 +10,7 @@ export const setCalendarEvents = async (
 	calendar: ICalCalendar,
 ): Promise<void> => {
 	oldCalendarEvents.forEach(({ id, start, end, summary, description, location, url }: CalendarEvent) => {
-		const eventUrl = typeof url === "object" && "val" in url ? url.val.toString() : url || "";
-		createICalEvent({ id, start, end, summary, description, location, url: eventUrl }, calendar);
+		createICalEvent({ id, start, end, summary, description, location, url: url || "" }, calendar);
 	});
 
 	newCalendarEvents.forEach((scheduleItem: ScheduleEntry) => {

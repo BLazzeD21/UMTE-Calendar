@@ -16,4 +16,6 @@ export * from "./changes/formatDiffForUser";
 
 export * from "./date/formatDateToRussian";
 
+export * from "./text/escapeHTML";
+
 export * from "./proxy/validateSocksProxy";

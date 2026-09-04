@@ -3,6 +3,7 @@ import { CalendarDiff, CalendarEvent } from "@/types";
 import { lexicon } from "@/lexicon";
 
 import { formatDateToRussian } from "../date/formatDateToRussian";
+import { escapeHTML } from "../text/escapeHTML";
 
 export function formatDiffForUser(diff: CalendarDiff): string {
 	const addedByDate: Record<string, string[]> = {};
@@ -37,12 +38,20 @@ export function formatDiffForUser(diff: CalendarDiff): string {
 		for (const key in event.changes) {
 			const change = event.changes[key as keyof CalendarEvent];
 
-			if (change) {
-				const oldValue = change.old instanceof Date ? change.old.toLocaleString() : change.old;
-				const newValue = change.new instanceof Date ? change.new.toLocaleString() : change.new;
+			if (!change) continue;
 
-				changes.push(`   📎 <i>${oldValue} → ${newValue}</i>`);
+			if (key === "url") {
+				const oldUrl = change.old ? escapeHTML(String(change.old)) : "";
+				const newUrl = change.new ? escapeHTML(String(change.new)) : "";
+
+				changes.push(`   🔗 <i>${lexicon.webinarLink(oldUrl, newUrl)}</i>`);
+				continue;
 			}
+
+			const oldValue = change.old instanceof Date ? change.old.toLocaleString() : change.old;
+			const newValue = change.new instanceof Date ? change.new.toLocaleString() : change.new;
+
+			changes.push(`   📎 <i>${oldValue} → ${newValue}</i>`);
 		}
 
 		changedByDate[date].push(`${event.summary}\n${changes.join("\n")}`);
