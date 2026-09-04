@@ -35,7 +35,18 @@ Playwright needs browsers installed: `npx playwright install`.
    the rest of the cycle or kill the process.
 4. Per group, `parseSchedule` launches a browser with a fresh `BrowserContext` (sessions must not leak between
    accounts), logs into umeos.ru and scrapes the schedule table into `ScheduleEntry[]`. It returns `[]` on any error
-   instead of throwing.
+   instead of throwing. A failed login is detected by reading `#loginerrormessage` when the redirect to `/my/` never
+   happens — otherwise wrong credentials surface only as an opaque navigation timeout.
+
+   The schedule itself is **not** taken from the rendered page. The `umerasp` block fills `#sched` from a click handler
+   in `rasper_0.17.js`, which needs the `jQuery` global that Moodle's `jquery-private.js` deletes with
+   `noConflict(true)`; the two load in a race, so the block silently fails to bind and `#sched_tabs` never appears.
+   Instead `parseSchedule` POSTs `type=group` + the `#groupselect` value to
+   `/blocks/umerasp/json_rasper.php` — the endpoint that handler would have called — and injects the returned HTML into
+   `#sched`. `page.request` shares the context's cookies, so the session from the login step carries over. The markup is
+   the same one the button produces (the group schedule gets no `rowspanizer` pass), which is why the row parsing below
+   it is unchanged. Do not "fix" this by clicking `#groupsubmit`: the click works only when jQuery happens to win.
+
 5. If `calendar/<groupId>.ics` exists → `updateCalendar`, else `createCalendar` (only on the first pass;
    scheduled passes skip a group whose calendar is missing).
 6. After a one-hour delay (`CONFIG.schedulerDelay`), `node-schedule` runs the cycle every hour

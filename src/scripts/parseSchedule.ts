@@ -30,9 +30,38 @@ export const parseSchedule = async ({
 
 		await page.click("#loginbtn");
 
-		await page.waitForURL("https://umeos.ru/my/", { waitUntil: "load" });
+		try {
+			await page.waitForURL("https://umeos.ru/my/", { waitUntil: "load" });
+		} catch (error) {
+			const loginError = await page
+				.locator("#loginerrormessage")
+				.first()
+				.innerText()
+				.catch(() => "");
+
+			if (loginError) throw new Error(lexicon.log.loginRejected(loginError.trim()));
+
+			throw error;
+		}
 
 		await page.goto("https://umeos.ru/blocks/umerasp/schedule.php?t=student");
+
+		const groupName = await page.locator("#groupselect").inputValue();
+
+		if (!groupName) throw new Error(lexicon.log.groupNotSelected);
+
+		// the block renders the table only from its own click handler, which is bound to a
+		// jQuery global that Moodle's requirejs removes whenever it wins the race, so the
+		// schedule is requested straight from the endpoint that handler would have called
+		const response = await page.request.post("https://umeos.ru/blocks/umerasp/json_rasper.php", {
+			form: { type: "group", groupname: groupName },
+		});
+
+		if (!response.ok()) throw new Error(lexicon.log.scheduleRequestFailed(response.status()));
+
+		const scheduleHtml = await response.text();
+
+		await page.locator("#sched").evaluate((element, html) => (element.innerHTML = html), scheduleHtml);
 
 		await page.waitForSelector("#sched_tabs");
 

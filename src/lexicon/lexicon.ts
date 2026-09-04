@@ -157,6 +157,13 @@ export const lexicon = {
 		},
 
 		/* schedule */
+		groupNotSelected: "The schedule page has no group selected for this account",
+		scheduleRequestFailed: (status: number) => {
+			return `The schedule request returned HTTP ${status}`;
+		},
+		loginRejected: (message: string) => {
+			return `umeos.ru rejected the login: ${message}`;
+		},
 		parseFailed: (error: unknown) => {
 			return `An error occurred while parsing the schedule: ${error}`;
 		},
