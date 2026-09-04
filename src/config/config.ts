@@ -21,6 +21,7 @@ export const CONFIG = {
 	sendAttempts: 3,
 	sendRetryDelay: 2000,
 	groupIdPattern: /^[a-zA-Z0-9_-]+$/,
+	adminIdPattern: /^\d+$/,
 };
 
 export const getCalendarUrl = (groupId: string): string | undefined => {
@@ -45,6 +46,16 @@ export const getApiRoot = (): string | undefined => {
 	const origin = /^https?:\/\//i.test(apiRoot) ? apiRoot : `https://${apiRoot}`;
 
 	return origin.replace(/\/+$/, "");
+};
+
+export const getAdminId = (): string | undefined => {
+	const adminId = process.env.TELEGRAM_ADMIN_ID?.trim();
+
+	if (!adminId || !CONFIG.adminIdPattern.test(adminId)) {
+		return undefined;
+	}
+
+	return adminId;
 };
 
 export const getGroupPaths = (groupId: string): GroupPaths => {

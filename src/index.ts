@@ -2,13 +2,22 @@ import "dotenv/config";
 import { promises } from "fs";
 import { scheduleJob } from "node-schedule";
 
-import { CONFIG, createGroupLogger, getApiRoot, getCalendarUrl, getGroupPaths, loadGroups, logger } from "@/config";
+import {
+	CONFIG,
+	createGroupLogger,
+	getAdminId,
+	getApiRoot,
+	getCalendarUrl,
+	getGroupPaths,
+	loadGroups,
+	logger,
+} from "@/config";
 
 import { cleanupBackups, createCalendar, parseSchedule, updateCalendar } from "@/scripts";
 
 import { getFile, validateSocksProxy } from "@/utils";
 
-import { GroupConfig, GroupContext } from "@/types";
+import { BotGroupTarget, GroupConfig, GroupContext } from "@/types";
 
 import { lexicon } from "@/lexicon";
 
@@ -86,6 +95,17 @@ const cleanupGroups = async (groups: GroupConfig[]) => {
 	}
 };
 
+const getBotTargets = (groups: GroupConfig[]): BotGroupTarget[] => {
+	return groups
+		.filter((group) => group.chatId)
+		.map((group) => ({
+			id: group.id,
+			name: group.name,
+			chatId: group.chatId,
+			topicId: group.topicId,
+		}));
+};
+
 const createBot = async (groups: GroupConfig[]): Promise<TelegramBot | null> => {
 	const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -100,6 +120,10 @@ const createBot = async (groups: GroupConfig[]): Promise<TelegramBot | null> => 
 		logger.info(lexicon.log.apiRootOverridden(apiRoot));
 	}
 
+	const adminId = getAdminId();
+
+	logger.info(adminId ? lexicon.log.adminEnabled(adminId) : lexicon.log.adminDisabled);
+
 	const proxyUrl = process.env.PROXY_URL;
 	const validProxy = await validateSocksProxy(proxyUrl);
 
@@ -109,6 +133,8 @@ const createBot = async (groups: GroupConfig[]): Promise<TelegramBot | null> => 
 		replyMessage: lexicon.replyMessage,
 		proxyUrl: validProxy ? proxyUrl : undefined,
 		apiRoot: apiRoot,
+		adminId: adminId,
+		groups: getBotTargets(groups),
 	});
 
 	bot.start();

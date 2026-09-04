@@ -19,6 +19,32 @@ export const lexicon = {
 	changedByDate: "🔄 Изменено:",
 	withoutDate: "без даты",
 
+	admin: {
+		noTargets: "Ни у одной группы не указан <code>chatId</code> — отправлять некуда.",
+		testStarted: (count: number) => {
+			return `🧪 Отправляю тестовое сообщение в <b>${count}</b> чат(ов)...`;
+		},
+		testMessage:
+			"🧪 <b>Тестовое сообщение</b>\n\nЕсли вы его видите, уведомления об изменении расписания доходят до этого чата.",
+		sendUsage:
+			"Отправьте команду вместе с текстом сообщения:\n<code>/send Завтра пар не будет</code>\n\nПосле этого можно будет выбрать, в какой чат его отправить.",
+		sendChooseTarget: (message: string) => {
+			return `Куда отправить сообщение?\n\n${message}`;
+		},
+		sendToAllButton: "📣 Во все чаты",
+		sendCancelButton: "❌ Отмена",
+		invalidMarkup: "Не удалось разобрать разметку сообщения. Проверьте HTML-теги и отправьте команду ещё раз.",
+		sendCancelled: "Отправка отменена.",
+		sendExpired: "Текст сообщения не найден — отправьте команду <code>/send</code> ещё раз.",
+		unknownTarget: "Такой группы больше нет в конфигурации.",
+		reportLine: (name: string, delivered: boolean) => {
+			return `${delivered ? "✅" : "❌"} ${name}`;
+		},
+		report: (lines: string[]) => {
+			return `<b>Результат отправки:</b>\n\n${lines.join("\n")}`;
+		},
+	},
+
 	log: {
 		/* proxy */
 		proxyDisabled: "Bot: The bot will be launched without using a proxy",
@@ -35,6 +61,16 @@ export const lexicon = {
 			return `Bot: Using a custom Bot API endpoint: ${apiRoot}`;
 		},
 		botStarting: "Bot: Starting...",
+		adminEnabled: (adminId: string) => {
+			return `Bot: Admin commands enabled for ${adminId}`;
+		},
+		adminDisabled: "Bot: TELEGRAM_ADMIN_ID is not set, admin commands are disabled",
+		adminCommand: (command: string, adminId: string) => {
+			return `Bot: Admin ${adminId} ran /${command}`;
+		},
+		botHandlerFailed: (error: unknown) => {
+			return `Bot: Handler failed: ${error}`;
+		},
 		botErrorStarting: "Bot: Error starting the bot",
 		sendMessageAttemptFailed: (attempt: number, error: unknown) => {
 			return `sendMessage attempt ${attempt} failed: ${error}`;

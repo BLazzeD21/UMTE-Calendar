@@ -24,12 +24,12 @@ cp groups.template.json groups.json
 
 Fill in `groups.json` (see [the table below](#2-installing-dependencies)) and `.env`:
 
-| Variable                          | Description                                                                   |
-| --------------------------------- | ----------------------------------------------------------------------------- |
-| `DOMAIN`                          | The host Caddy issues the certificate for. Must resolve to this server.       |
-| `CALENDAR_BASE_URL`               | Base of the links sent to Telegram. Normally `https://<DOMAIN>`.              |
-| `TZ`                              | Timezone of the container, `Europe/Moscow` by default.                        |
-| `TELEGRAM_BOT_TOKEN`, `PROXY_URL` | Optional, see [section 6](#6-schedule-change-notifications-via-telegram-bot). |
+| Variable                                               | Description                                                                   |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `DOMAIN`                                               | The host Caddy issues the certificate for. Must resolve to this server.       |
+| `CALENDAR_BASE_URL`                                    | Base of the links sent to Telegram. Normally `https://<DOMAIN>`.              |
+| `TZ`                                                   | Timezone of the container, `Europe/Moscow` by default.                        |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_ADMIN_ID`, `PROXY_URL` | Optional, see [section 6](#6-schedule-change-notifications-via-telegram-bot). |
 
 > [!IMPORTANT]
 > `groups.json` and `.env` must exist as **files** before the first start. They are bind-mounted, and Docker silently
@@ -72,7 +72,7 @@ tg.example.tech {
 }
 ```
 
-`PROXY_URL` (see [section 6](#6-using-a-socks-proxy-for-a-telegram-bot)) is an alternative to the mirror, not a
+`PROXY_URL` (see [section 8](#8-using-a-socks-proxy-for-a-telegram-bot)) is an alternative to the mirror, not a
 companion — leave it empty while `TELEGRAM_API_ROOT` is set.
 
 ### 2. Start
@@ -437,7 +437,37 @@ file generated, it is just never announced.
 
 After filling in `.env`, `groups.json` and adding the **bot** to the chats, the bot will work correctly and send messages _every time the schedule changes_.
 
-### 6. Using a Socks proxy for a Telegram bot
+### 7. Admin commands
+
+The bot has two commands for the person who runs it. They are disabled until `TELEGRAM_ADMIN_ID` is set in `.env` to
+**your own Telegram user id** (a number — [@userinfobot](https://telegram.me/userinfobot) will tell you yours):
+
+```bash
+TELEGRAM_ADMIN_ID=123456789
+```
+
+Leave the variable out and the bot has no admin at all: both commands answer with the usual "I cannot reply to
+messages" text, exactly as they do for everyone else. There is no other way in — the check is the numeric user id.
+
+| Command        | What it does                                                                                                                 |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `/test`        | Sends a test message to every group that has a `chatId` and reports which chats it reached. Use it after adding a new group. |
+| `/send <text>` | Asks which chat to send `<text>` to — a button per group, plus **Во все чаты** — and sends it after you pick one.            |
+
+Both commands are meant for a private chat with the bot and report delivery per group:
+
+```
+/send Завтра пар не будет
+
+Куда отправить сообщение?
+Завтра пар не будет
+[ ИСП-21 ] [ ИВТ-22 ] [ 📣 Во все чаты ] [ ❌ Отмена ]
+```
+
+Messages are sent as HTML, so `<b>bold</b>` works and a stray `<` does not — if the markup is broken the bot says so
+instead of sending anything. A group without a `chatId` is never offered as a destination.
+
+### 8. Using a Socks proxy for a Telegram bot
 
 To run the bot with `SocksProxyAgent`, you need to add `PROXY_URL` to `.env` in the format shown below:
 

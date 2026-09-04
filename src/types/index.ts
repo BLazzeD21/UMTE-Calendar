@@ -110,10 +110,17 @@ export interface MessageTarget {
 	topicId?: string;
 }
 
+export interface BotGroupTarget extends MessageTarget {
+	id: string;
+	name: string;
+}
+
 export interface TelegramBotOptions {
 	token: string;
 	startMessage: string;
 	replyMessage: string;
 	proxyUrl?: string;
 	apiRoot?: string;
+	adminId?: string;
+	groups?: BotGroupTarget[];
 }

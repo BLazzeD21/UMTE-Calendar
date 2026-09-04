@@ -68,6 +68,22 @@ Event identity is the UID built in `prepareEventData`: `${classNumber}-${subject
 added/removed/changed diff in `compareCalendarsJSON` keys entirely off it — changing the UID format invalidates all
 existing calendars and would surface as a mass remove+add notification.
 
+## Admin commands
+
+The bot answers two commands beyond `/start`, both gated on `TELEGRAM_ADMIN_ID` (`getAdminId`, digits only): `/test`
+sends a fixed test message to every group that has a `chatId`, and `/send <text>` asks which chat to send `<text>` to
+via an inline keyboard, then delivers it. Both report per-group delivery back to the admin.
+
+Unset `TELEGRAM_ADMIN_ID` means **there is no admin** — `isAdmin` returns false for everyone and both commands answer
+with the ordinary `replyMessage`, so they are invisible to regular users rather than refused. Never gate them on
+anything else (a chat id, a username): the numeric user id is the only check.
+
+The chosen text lives in a single `pendingMessage` field between the command and the button press, which is correct
+only because there is exactly one admin — a second admin would need a per-user map. Callback data is
+`send:<group id>`, plus `send:*` (all chats) and `send:!` (cancel); `*` and `!` are outside `groupIdPattern`, so they
+can never collide with a real group. Admin text is sent with `parse_mode: HTML` like every other message, so a broken
+tag fails the preview reply — that is caught in `askTarget` and reported instead of silently losing the message.
+
 ## Layout & conventions
 
 ```
@@ -103,8 +119,8 @@ public subscription link. The link is **derived, never configured per group**: `
 when the variable is unset (`lexicon.message` then omits the link). Don't reintroduce a per-group URL field — it would
 let the link drift away from the file actually being written.
 
-`.env` (gitignored, template in `.env.template`): `TELEGRAM_BOT_TOKEN`, `CALENDAR_BASE_URL` and `PROXY_URL`
-(`socks5://user:pass@host:port`) are optional and shared by all groups. `UMTE_USERNAME`, `UMTE_PASSWORD`, `CHAT_ID`,
+`.env` (gitignored, template in `.env.template`): `TELEGRAM_BOT_TOKEN`, `CALENDAR_BASE_URL`, `TELEGRAM_ADMIN_ID` and
+`PROXY_URL` (`socks5://user:pass@host:port`) are optional and shared by all groups. `UMTE_USERNAME`, `UMTE_PASSWORD`, `CHAT_ID`,
 `TOPIC_ID` are the legacy single-group fallback, read only when `groups.json` does not exist.
 
 Never commit real credentials — the values in `.env.template` and `groups.template.json` are dummies.
