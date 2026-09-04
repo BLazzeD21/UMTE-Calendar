@@ -68,9 +68,19 @@ Event identity is the UID built in `prepareEventData`: `${classNumber}-${subject
 added/removed/changed diff in `compareCalendarsJSON` keys entirely off it — changing the UID format invalidates all
 existing calendars and would surface as a mass remove+add notification.
 
+## Bot commands
+
+`/start` and `/help` are public; `/help` prints the command list and, for the admin, the admin section on top of it.
+The menu Telegram suggests is set in `registerCommands` **per scope**, not globally: `all_private_chats` and
+`all_group_chats` get the public pair, and the admin's own chat (`{ type: "chat", chat_id }`) additionally gets
+`/test` and `/send`, so nobody else is even offered them. Registering the admin scope fails when the admin has never
+opened a chat with the bot — that is caught separately so the public menu still lands. Telegram keeps a chat scope
+until it is overwritten, so clearing `TELEGRAM_ADMIN_ID` leaves the old admin's menu showing commands the handlers
+now refuse.
+
 ## Admin commands
 
-The bot answers two commands beyond `/start`, both gated on `TELEGRAM_ADMIN_ID` (`getAdminId`, digits only): `/test`
+The bot answers two more commands, both gated on `TELEGRAM_ADMIN_ID` (`getAdminId`, digits only): `/test`
 sends a fixed test message to every group that has a `chatId`, and `/send <text>` asks which chat to send `<text>` to
 via an inline keyboard, then delivers it. Both report per-group delivery back to the admin.
 

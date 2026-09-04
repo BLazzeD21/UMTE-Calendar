@@ -1,5 +1,5 @@
 import { Bot, Context, InlineKeyboard } from "grammy";
-import { ParseMode } from "grammy/types";
+import { BotCommand, ParseMode } from "grammy/types";
 import { SocksProxyAgent } from "socks-proxy-agent";
 
 import { CONFIG, logger } from "@/config";
@@ -12,6 +12,16 @@ const PARSE_MODE = "HTML";
 const SEND_PREFIX = "send:";
 const SEND_ALL = "*";
 const SEND_CANCEL = "!";
+
+const PUBLIC_COMMANDS: BotCommand[] = [
+	{ command: "start", description: lexicon.commands.start },
+	{ command: "help", description: lexicon.commands.help },
+];
+
+const ADMIN_COMMANDS: BotCommand[] = [
+	{ command: "test", description: lexicon.commands.test },
+	{ command: "send", description: lexicon.commands.send },
+];
 
 export class TelegramBot {
 	private bot: Bot<Context>;
@@ -50,7 +60,30 @@ export class TelegramBot {
 			logger.error(`${lexicon.log.botErrorStarting} - ${error}`);
 		});
 
+		this.registerCommands().catch((error) => {
+			logger.error(lexicon.log.commandsFailed(error));
+		});
+
 		logger.info(lexicon.log.botStarting);
+	}
+
+	private async registerCommands() {
+		await this.bot.api.setMyCommands(PUBLIC_COMMANDS, { scope: { type: "all_private_chats" } });
+		await this.bot.api.setMyCommands(PUBLIC_COMMANDS, { scope: { type: "all_group_chats" } });
+
+		logger.info(lexicon.log.commandsRegistered);
+
+		if (!this.adminId) {
+			return;
+		}
+
+		try {
+			await this.bot.api.setMyCommands([...PUBLIC_COMMANDS, ...ADMIN_COMMANDS], {
+				scope: { type: "chat", chat_id: Number(this.adminId) },
+			});
+		} catch (error) {
+			logger.error(lexicon.log.adminCommandsFailed(error));
+		}
 	}
 
 	private registerHandlers() {
@@ -60,6 +93,14 @@ export class TelegramBot {
 
 		this.bot.command("start", async (ctx) => {
 			await ctx.reply(this.startMessage, { parse_mode: PARSE_MODE });
+		});
+
+		this.bot.command("help", async (ctx) => {
+			const message = this.isAdmin(ctx)
+				? `${lexicon.helpMessage}\n\n${lexicon.admin.helpMessage}`
+				: lexicon.helpMessage;
+
+			await ctx.reply(message, { parse_mode: PARSE_MODE });
 		});
 
 		this.bot.command("test", async (ctx) => {

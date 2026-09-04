@@ -19,7 +19,19 @@ export const lexicon = {
 	changedByDate: "🔄 Изменено:",
 	withoutDate: "без даты",
 
+	commands: {
+		start: "что умеет бот",
+		help: "список команд",
+		test: "тестовое сообщение во все чаты",
+		send: "отправить сообщение в выбранный чат",
+	},
+
+	helpMessage:
+		'<b>Что я умею</b>\n\nСлежу за расписанием на портале <a href="https://umeos.ru/my/">umeos</a> и присылаю в чат уведомление, когда оно меняется.\n\n<b>Команды</b>\n\n/start — приветствие\n/help — этот список',
+
 	admin: {
+		helpMessage:
+			"<b>Команды администратора</b>\n\n/test — отправить тестовое сообщение во все чаты и показать, куда оно дошло\n/send &lt;текст&gt; — отправить сообщение в выбранный чат",
 		noTargets: "Ни у одной группы не указан <code>chatId</code> — отправлять некуда.",
 		testStarted: (count: number) => {
 			return `🧪 Отправляю тестовое сообщение в <b>${count}</b> чат(ов)...`;
@@ -65,6 +77,13 @@ export const lexicon = {
 			return `Bot: Admin commands enabled for ${adminId}`;
 		},
 		adminDisabled: "Bot: TELEGRAM_ADMIN_ID is not set, admin commands are disabled",
+		commandsRegistered: "Bot: Command list registered",
+		commandsFailed: (error: unknown) => {
+			return `Bot: Unable to register the command list: ${error}`;
+		},
+		adminCommandsFailed: (error: unknown) => {
+			return `Bot: Unable to register admin commands, the admin has probably never opened a chat with the bot: ${error}`;
+		},
 		adminCommand: (command: string, adminId: string) => {
 			return `Bot: Admin ${adminId} ran /${command}`;
 		},

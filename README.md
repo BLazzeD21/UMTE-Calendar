@@ -439,7 +439,9 @@ After filling in `.env`, `groups.json` and adding the **bot** to the chats, the 
 
 ### 7. Admin commands
 
-The bot has two commands for the person who runs it. They are disabled until `TELEGRAM_ADMIN_ID` is set in `.env` to
+`/start` and `/help` work for everyone — `/help` lists what the bot can do and the commands it accepts.
+
+The bot has two more commands for the person who runs it. They are disabled until `TELEGRAM_ADMIN_ID` is set in `.env` to
 **your own Telegram user id** (a number — [@userinfobot](https://telegram.me/userinfobot) will tell you yours):
 
 ```bash
@@ -454,7 +456,9 @@ messages" text, exactly as they do for everyone else. There is no other way in �
 | `/test`        | Sends a test message to every group that has a `chatId` and reports which chats it reached. Use it after adding a new group. |
 | `/send <text>` | Asks which chat to send `<text>` to — a button per group, plus **Во все чаты** — and sends it after you pick one.            |
 
-Both commands are meant for a private chat with the bot and report delivery per group:
+Telegram only suggests `/test` and `/send` in your own chat with the bot — everyone else sees `/start` and `/help`,
+and `/help` shows the admin section only to you. Both commands are meant for a private chat with the bot and report
+delivery per group:
 
 ```
 /send Завтра пар не будет
